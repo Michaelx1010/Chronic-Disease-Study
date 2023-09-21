@@ -1,20 +1,59 @@
 project:
   type: website
 
+      
 website:
-  title: "DSAN-5000: Project"
-  navbar:
+  title: "Predictive data modelling with chronic diseases."
+  navbar: 
+    search: true
+    collapse-below: xxl
     left:
-      - href: index.qmd
-        text: Home
-      - href: clustering/clustering.qmd
-        text: Clustering
+      - href: about.qmd
+        text: about Michael
+        
+      - href: Code.qmd
+        text: Code
+        
+      - href: Data.qmd
+        text: Data
+        
+      - href: Introduction.qmd
+        text: Introduction
+        
+      - href: Data_Gathering.qmd
+        text: Data Gathering
+        
+      - href: Data_Cleaning.qmd
+        text: Data Cleaning
+        
       - href: eda/eda.ipynb
         text: Data Exploration
+        
+      - href: clustering/clustering.qmd
+        text: clustering
+        
+      - href: Dimensionality_reduction.qmd
+        text: Dimensionality reduction
+       
+      - href: Decision_Trees.qmd
+        text: Decision Tress
+        
+      - href: ARM.qmd
+        text: ARM
+        
+      - href: Conclusions.qmd
+        text: Conclusions
+     
+
+
 format:
   html:
-    theme: cosmo
+    theme: journal
+    #css: journal.scss
     toc: true
+
+editor: visual
+
 
 
 

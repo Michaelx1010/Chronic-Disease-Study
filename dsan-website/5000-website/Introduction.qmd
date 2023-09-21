@@ -1,0 +1,28 @@
+---
+title: "Introduction"
+bibliography: references.bib
+---
+
+### [Environmental/lifestyle factors in the pathogenesis and prevention of type 2 diabetes](https://bmcmedicine.biomedcentral.com/articles/10.1186/s12916-017-0901-x)
+
+-   This article talks about different factors related to the causes and prevention of type 2 diabetes (T2D) based on epidemiological studies and intervention trials. This article dives deeply in different aspects of lifestyle factors including dietary habits, sleeping disorders, mental affects, body fat mass, etc. This topic is crucial for investigating potential lifestyle risk factors to develop T2D, that could not only improve public awareness but also give data collecting/analysis hypothesis for biostatistician.
+-   This article also address current data on personal, environmental, and lifestyle aspects are often limited. A host of environmental or lifestyle-dependent T2D risk factors have been described in prospective epidemiological studies, ranging from energy-dense food consumption to long-term exposure to high levels of fine dust. In these studies, the amount of personal, environmental or lifestyle aspects data that can or has been documented is limited, leaving room for confounding. @kolb2017environmentallifestyle
+-   This article will give me the initial hypothesis of possible factors that contribute do the developmnent of T2D. I will be able explore relevant datasets according to those hypothesis.
+
+### [Cancer Prevention: From 1727 to Milestones of the Past 100 Years](https://aacrjournals.org/cancerres/article/69/13/5269/549769/Cancer-Prevention-From-1727-to-Milestones-of-the)
+
+-   This article @lippman2009cancer talks about the rich history of the efforts on cancer prevention from from 1727 to milestones of the past 100 years, it disucsses the importance of historical research of cancer prevention and how it provides foundations for modern method including Molecular-Targeted Combinations, Population-Wide Approaches, Angiogenesis Targeting, New Imaging Approaches.
+-   Cancer is obviously a huge challenge that affects millions of lives in this world. In order to better understand the cancer and its prevention methods, we can facilitate early detection that leads to more effective treatments. The information in ths article provide me with a better understanding of cancer and its historical prevention methods, gives me insight on hypothesis testing.
+
+### Questions to answer:
+
+1. What are the risk factors(including lifestyles, diets, enviromental factors, genetics, etc) that contributes to T2D? In other words, what factors have strong statitical correlation with the incidence of T2D.
+2. What risk factors have less correlation with T2D?
+3. Among the risk factors that have strong correlation with T2D, which one has the highest correlation?
+4. Among the risk factors that have less correlation with T2D, which one has the least correlation?
+5. What types of predictive has the best estimate an individual's risk of developing T2D? 
+6. Are there early signs that can be detected through regression analysis, allowing for the early diagnosis of T2D?
+7. Can we develop accurate predictive models for blood glucose levels in T2D patients to help with insulin dosage and meal planning?
+8. Can we use machine learning or time-series models to detect early signs of cancer?
+9. What are the risk factors associated with specific types of cancer? How do genetic, lifestyle, environmental, and demographic factors contribute to cancer development?
+10. How can data visualization effectively communicate information of chronic diseases.
