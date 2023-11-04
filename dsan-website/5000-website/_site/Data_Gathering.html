@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -61,7 +95,6 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="materia.scss">
 </head>
 
 <body class="nav-fixed">
@@ -106,12 +139,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Data Cleaning</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./eda/Data_Exploration.qmd" rel="" target="">
+    <a class="nav-link" href="./eda/eda.html" rel="" target="">
  <span class="menu-text">Data Exploration</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./Clustering/Clustering.qmd" rel="" target="">
- <span class="menu-text">Clustering</span></a>
+    <a class="nav-link" href="./clustering/clustering.html" rel="" target="">
+ <span class="menu-text">clustering</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./Dimensionality_reduction.html" rel="" target="">
@@ -141,14 +174,25 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#notes" id="toc-notes" class="nav-link active" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#u.s.-chronic-disease-indicators-cdi" id="toc-u.s.-chronic-disease-indicators-cdi" class="nav-link" data-scroll-target="#u.s.-chronic-disease-indicators-cdi">U.S. Chronic Disease Indicators (CDI)</a></li>
+  <li><a href="#alzheimers-disease-and-healthy-aging-data" id="toc-alzheimers-disease-and-healthy-aging-data" class="nav-link" data-scroll-target="#alzheimers-disease-and-healthy-aging-data">Alzheimer’s Disease and Healthy Aging Data</a></li>
+  <li><a href="#behavioral-risk-factor-data-tobacco-use-2011-to-present" id="toc-behavioral-risk-factor-data-tobacco-use-2011-to-present" class="nav-link" data-scroll-target="#behavioral-risk-factor-data-tobacco-use-2011-to-present">Behavioral Risk Factor Data: Tobacco Use (2011 to present)</a></li>
+  <li><a href="#specific-chronic-conditions" id="toc-specific-chronic-conditions" class="nav-link" data-scroll-target="#specific-chronic-conditions">Specific Chronic Conditions)</a></li>
+  <li><a href="#framingham-heart-study-longitudinal-data" id="toc-framingham-heart-study-longitudinal-data" class="nav-link" data-scroll-target="#framingham-heart-study-longitudinal-data">Framingham Heart Study Longitudinal Data</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Data Gathering</h1>
+<div class="quarto-title-block"><div><h1 class="title">Data Gathering</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -163,8 +207,285 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="notes" class="level3">
+<h3 class="anchored" data-anchor-id="notes">Notes</h3>
+<p>For HW2, accessing health data especially in chronic disease data like diabetes and cancer is quite hard by using APIs, so I won’t be using either Python or R APIs to extract data, it is just not worth the time.</p>
+</section>
+<section id="u.s.-chronic-disease-indicators-cdi" class="level3">
+<h3 class="anchored" data-anchor-id="u.s.-chronic-disease-indicators-cdi"><a href="https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi">U.S. Chronic Disease Indicators (CDI)</a></h3>
+<p>CDC’s Division of Population Health provides cross-cutting set of 124 indicators that were developed by consensus and that allows states and territories and large metropolitan areas to uniformly define, collect, and report chronic disease data that are important to public health practice and available for states, territories and large metropolitan areas. In addition to providing access to state-specific indicator data, the CDI web site serves as a gateway to additional information and data resources.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>us_chronic <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/U.S._Chronic_Disease_Indicators__CDI_.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 34
+  YearStart YearEnd LocationAbbr LocationDesc DataSource Topic Question Response
+      &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;    &lt;lgl&gt;   
+1      2010    2010 OR           Oregon       NVSS       Card… Mortali… NA      
+2      2019    2019 AZ           Arizona      YRBSS      Alco… Alcohol… NA      
+3      2019    2019 OH           Ohio         YRBSS      Alco… Alcohol… NA      
+4      2019    2019 US           United Stat… YRBSS      Alco… Alcohol… NA      
+5      2015    2015 VI           Virgin Isla… YRBSS      Alco… Alcohol… NA      
+6      2020    2020 AL           Alabama      PRAMS      Alco… Alcohol… NA      
+# ℹ 26 more variables: DataValueUnit &lt;chr&gt;, DataValueType &lt;chr&gt;,
+#   DataValue &lt;chr&gt;, DataValueAlt &lt;dbl&gt;, DataValueFootnoteSymbol &lt;chr&gt;,
+#   DatavalueFootnote &lt;chr&gt;, LowConfidenceLimit &lt;dbl&gt;,
+#   HighConfidenceLimit &lt;dbl&gt;, StratificationCategory1 &lt;chr&gt;,
+#   Stratification1 &lt;chr&gt;, StratificationCategory2 &lt;lgl&gt;,
+#   Stratification2 &lt;lgl&gt;, StratificationCategory3 &lt;lgl&gt;,
+#   Stratification3 &lt;lgl&gt;, GeoLocation &lt;chr&gt;, ResponseID &lt;lgl&gt;, …</code></pre>
+</div>
+</div>
+</section>
+<section id="alzheimers-disease-and-healthy-aging-data" class="level3">
+<h3 class="anchored" data-anchor-id="alzheimers-disease-and-healthy-aging-data"><a href="https://catalog.data.gov/dataset/alzheimers-disease-and-healthy-aging-data">Alzheimer’s Disease and Healthy Aging Data</a></h3>
+<p>The Alzheimer’s Disease and Healthy Aging Data set is a collection of data gathered from the Behavioral Risk Factor Surveillance System (BRFSS) from 2015 to 2021. Published by the Centers for Disease Control and Prevention (CDC), this dataset aims at providing insights into the health and well-being of older adults. The dataset covers various topics including cognitive health, alcohol consumption, falls, caregiver information, dietary habits, obesity, overall health, screenings, smoking, and vaccines.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>alzheimer <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Alzheimer_s_Disease_and_Healthy_Aging_Data.csv"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(alzheimer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                       RowId YearStart YearEnd LocationAbbr
+1    BRFSS~2021~2021~9004~Q43~TOC11~AGE~RACE      2021    2021         WEST
+2 BRFSS~2017~2017~9001~Q43~TOC11~AGE~OVERALL      2017    2017          NRE
+3 BRFSS~2019~2019~9002~Q02~TNC02~AGE~OVERALL      2019    2019          MDW
+4    BRFSS~2020~2020~59~Q43~TOC11~AGE~GENDER      2020    2020           US
+5    BRFSS~2020~2020~33~Q03~TMC01~AGE~GENDER      2020    2020           NH
+6    BRFSS~2015~2015~9002~Q43~TOC11~AGE~RACE      2015    2015          MDW
+                     LocationDesc Datasource
+1                            West      BRFSS
+2                       Northeast      BRFSS
+3                         Midwest      BRFSS
+4 United States, DC &amp; Territories      BRFSS
+5                   New Hampshire      BRFSS
+6                         Midwest      BRFSS
+                                Class                             Topic
+1                      Overall Health      Arthritis among older adults
+2                      Overall Health      Arthritis among older adults
+3 Nutrition/Physical Activity/Obesity Eating 3 or more vegetables daily
+4                      Overall Health      Arthritis among older adults
+5                       Mental Health          Frequent mental distress
+6                      Overall Health      Arthritis among older adults
+                                                                  Question
+1                 Percentage of older adults ever told they have arthritis
+2                 Percentage of older adults ever told they have arthritis
+3     Percentage of older adults who are eating 3 or more vegetables daily
+4                 Percentage of older adults ever told they have arthritis
+5 Percentage of older adults who are experiencing frequent mental distress
+6                 Percentage of older adults ever told they have arthritis
+  Response Data_Value_Unit DataValueTypeID Data_Value_Type Data_Value
+1       NA               %           PRCTG      Percentage       31.6
+2       NA               %           PRCTG      Percentage       50.3
+3       NA               %           PRCTG      Percentage       14.3
+4       NA               %           PRCTG      Percentage       55.5
+5       NA               %           PRCTG      Percentage       15.2
+6       NA               %           PRCTG      Percentage       59.8
+  Data_Value_Alt Data_Value_Footnote_Symbol Data_Value_Footnote
+1           31.6                                               
+2           50.3                                               
+3           14.3                                               
+4           55.5                                               
+5           15.2                                               
+6           59.8                                               
+  Low_Confidence_Limit High_Confidence_Limit Sample_Size
+1                 28.8                  34.4          NA
+2                 49.1                  51.6          NA
+3                 13.8                  14.8          NA
+4                 54.5                  56.4          NA
+5                 12.8                  18.0          NA
+6                 48.4                  70.2          NA
+  StratificationCategory1   Stratification1 StratificationCategory2
+1               Age Group           Overall          Race/Ethnicity
+2               Age Group 65 years or older                        
+3               Age Group           Overall                        
+4               Age Group 65 years or older                  Gender
+5               Age Group       50-64 years                  Gender
+6               Age Group 65 years or older          Race/Ethnicity
+           Stratification2 StratificationCategory3 Stratification3
+1                 Hispanic                      NA              NA
+2                                               NA              NA
+3                                               NA              NA
+4                   Female                      NA              NA
+5                   Female                      NA              NA
+6 Native Am/Alaskan Native                      NA              NA
+                                   Geolocation ClassID TopicID QuestionID
+1                                                  C01   TOC11        Q43
+2                                                  C01   TOC11        Q43
+3                                                  C02   TNC02        Q02
+4                                                  C01   TOC11        Q43
+5 POINT (-71.50036091999965 43.65595011300047)     C05   TMC01        Q03
+6                                                  C01   TOC11        Q43
+  ResponseID LocationID StratificationCategoryID1 StratificationID1
+1         NA       9004                       AGE       AGE_OVERALL
+2         NA       9001                       AGE            65PLUS
+3         NA       9002                       AGE       AGE_OVERALL
+4         NA         59                       AGE            65PLUS
+5         NA         33                       AGE              5064
+6         NA       9002                       AGE            65PLUS
+  StratificationCategoryID2 StratificationID2 StratificationCategoryID3
+1                      RACE               HIS                        NA
+2                   OVERALL           OVERALL                        NA
+3                   OVERALL           OVERALL                        NA
+4                    GENDER            FEMALE                        NA
+5                    GENDER            FEMALE                        NA
+6                      RACE               NAA                        NA
+  StratificationID3 Report
+1                NA     NA
+2                NA     NA
+3                NA     NA
+4                NA     NA
+5                NA     NA
+6                NA     NA</code></pre>
+</div>
+</div>
+</section>
+<section id="behavioral-risk-factor-data-tobacco-use-2011-to-present" class="level3">
+<h3 class="anchored" data-anchor-id="behavioral-risk-factor-data-tobacco-use-2011-to-present"><a href="https://catalog.data.gov/dataset/behavioral-risk-factor-data-tobacco-use-2011-to-present">Behavioral Risk Factor Data: Tobacco Use (2011 to present)</a></h3>
+<p>2011-2019. Centers for Disease Control and Prevention (CDC). State Tobacco Activities Tracking and Evaluation (STATE) System. BRFSS Survey Data. The BRFSS is a continuous, state-based surveillance system that collects information about modifiable risk factors for chronic diseases and other leading causes of death. The data for the STATE System were extracted from the annual BRFSS surveys from participating states. Tobacco topics included are cigarette and e-cigarette use prevalence by demographics, cigarette and e-cigarette use frequency, and quit attempts. NOTE: these data are not to be compared with BRFSS data collected 2010 and prior, as the methodologies were changed. Please refer to the FAQs / Methodology sections for more details.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>smoke <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Behavioral_Risk_Factor_Data.csv"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(smoke)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  YEAR LocationAbbr                    LocationDesc                 TopicType
+1 2017           GU                            Guam Tobacco Use – Survey Data
+2 2018           US National Median (States and DC) Tobacco Use – Survey Data
+3 2017           US National Median (States and DC) Tobacco Use – Survey Data
+4 2016           GU                            Guam Tobacco Use – Survey Data
+5 2014           GU                            Guam Tobacco Use – Survey Data
+6 2012           IN                         Indiana Tobacco Use – Survey Data
+                       TopicDesc     MeasureDesc DataSource Response
+1         Cigarette Use (Adults) Current Smoking      BRFSS         
+2         Cigarette Use (Adults)  Smoking Status      BRFSS  Current
+3         Cigarette Use (Adults)  Smoking Status      BRFSS    Never
+4 Smokeless Tobacco Use (Adults)     Current Use      BRFSS         
+5         Cigarette Use (Adults) Current Smoking      BRFSS         
+6         Cigarette Use (Adults) Current Smoking      BRFSS         
+  Data_Value_Unit Data_Value_Type Data_Value Data_Value_Footnote_Symbol
+1               %      Percentage       30.0                           
+2               %      Percentage       16.1                           
+3               %      Percentage       58.2                           
+4               %      Percentage        0.5                           
+5               %      Percentage       21.9                           
+6               %      Percentage       21.6                           
+  Data_Value_Footnote Data_Value_Std_Err Low_Confidence_Limit
+1                                    2.3                 25.4
+2                                     NA                   NA
+3                                     NA                   NA
+4                                    0.4                  0.0
+5                                    4.9                 12.4
+6                                    0.8                 20.0
+  High_Confidence_Limit Sample_Size  Gender      Race      Age  Education
+1                  34.6         692    Male All Races All Ages All Grades
+2                    NA          NA Overall All Races All Ages All Grades
+3                    NA          NA Overall All Races All Ages All Grades
+4                   1.2         123 Overall  Hispanic All Ages All Grades
+5                  31.4         209 Overall     White All Ages All Grades
+6                  23.2        5165  Female All Races All Ages All Grades
+                               GeoLocation TopicTypeId TopicId MeasureId
+1                  (13.444304, 144.793731)         BEH  100BEH    110CSA
+2                                                  BEH  100BEH    165SSA
+3                                                  BEH  100BEH    165SSA
+4                  (13.444304, 144.793731)         BEH  150BEH    177SCU
+5                  (13.444304, 144.793731)         BEH  100BEH    110CSA
+6 (39.766910452000445, -86.14996019399968)         BEH  100BEH    110CSA
+  StratificationID1 StratificationID2 StratificationID3 StratificationID4
+1              2GEN              8AGE              6RAC              6EDU
+2              1GEN              8AGE              6RAC              6EDU
+3              1GEN              8AGE              6RAC              6EDU
+4              1GEN              8AGE              4RAC              6EDU
+5              1GEN              8AGE              5RAC              6EDU
+6              3GEN              8AGE              6RAC              6EDU
+  SubMeasureID DisplayOrder
+1        BRF21           21
+2        BRF27           27
+3        BRF28           28
+4        BRF69           69
+5        BRF22           22
+6        BRF21           21</code></pre>
+</div>
+</div>
+</section>
+<section id="specific-chronic-conditions" class="level3">
+<h3 class="anchored" data-anchor-id="specific-chronic-conditions"><a href="https://catalog.data.gov/dataset/specific-chronic-conditions-0f448">Specific Chronic Conditions)</a></h3>
+<p>The Select Chronic Conditions dataset provides information on 21 selected chronic conditions among Original Medicare beneficiaries. The dataset contains prevalence, use and spending organized by geography and distinct chronic conditions listed below.</p>
+<p>• Alcohol Abuse Drug Abuse/ Substance Abuse • Alzheimer’s Disease and Related Dementia • Arthritis (Osteoarthritis and Rheumatoid) • Asthma • Atrial Fibrillation • Autism Spectrum Disorders • Cancer (Breast, Colorectal, Lung, and Prostate) • Chronic Kidney Disease • Chronic Obstructive Pulmonary Disease • Depression • Diabetes • Drug Abuse/ Substance Abuse • Heart Failure • Hepatitis (Chronic Viral B &amp; C) • HIV/AIDS • Hyperlipidemia (High cholesterol) • Hypertension (High blood pressure) • Ischemic Heart Disease • Osteoporosis • Schizophrenia and Other Psychotic Disorders • Stroke</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>chronic <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/CC_R20_P08_v10_D18_WWDSE_Cond (1).csv"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(chronic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Bene_Geo_Lvl Bene_Geo_Desc Bene_Geo_Cd Bene_Age_Lvl Bene_Demo_Lvl
+1        State       Alabama           1          All           All
+2        State       Alabama           1          65+   Dual Status
+3        State       Alabama           1          &lt;65   Dual Status
+4        State       Alabama           1          All   Dual Status
+5        State       Alabama           1          65+   Dual Status
+6        State       Alabama           1          &lt;65   Dual Status
+         Bene_Demo_Desc     Bene_Cond Prvlnc Tot_Mdcr_Stdzd_Pymt_PC
+1                   All Alcohol Abuse 0.0188               25102.34
+2         Medicare Only Alcohol Abuse 0.0118                     NA
+3         Medicare Only Alcohol Abuse 0.0320                     NA
+4         Medicare Only Alcohol Abuse 0.0147                     NA
+5 Medicare and Medicaid Alcohol Abuse 0.0238                     NA
+6 Medicare and Medicaid Alcohol Abuse 0.0465                     NA
+  Tot_Mdcr_Pymt_PC Hosp_Readmsn_Rate ER_Visits_Per_1000_Benes
+1          23348.6            0.2413                 2184.756
+2               NA                NA                       NA
+3               NA                NA                       NA
+4               NA                NA                       NA
+5               NA                NA                       NA
+6               NA                NA                       NA</code></pre>
+</div>
+</div>
+</section>
+<section id="framingham-heart-study-longitudinal-data" class="level3">
+<h3 class="anchored" data-anchor-id="framingham-heart-study-longitudinal-data"><a href="https://www.framinghamheartstudy.org/fhs-for-researchers/data-available-overview/">Framingham Heart Study Longitudinal Data</a></h3>
+<p>The Framingham Heart Study is a long term prospective study of the etiology of cardiovascular disease among a population of free living subjects in the community of Framingham, Massachusetts. The Framingham Heart Study was a landmark study in epidemiology in that it was the first prospective study of cardiovascular disease and identified the concept of risk factors and their joint effects. The study began in 1948 and 5,209 subjects were initially enrolled in the study. Participants have been examined biennially since the inception of the study and all subjects are continuously followed through regular surveillance for cardiovascular outcomes. Clinic examination data has included cardiovascular disease risk factors and markers of disease such as blood pressure, blood chemistry, lung function, smoking history, health behaviors, ECG tracings, Echocardiography, and medication use. Through regular surveillance of area hospitals, participant contact, and death certificates, the Framingham Heart Study reviews and adjudicates events for the occurrence of Angina Pectoris, Myocardial Infarction, Heart Failure, and Cerebrovascular disease.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>heart_study <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/frmgham2.csv"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(heart_study)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 39
+  RANDID   SEX TOTCHOL   AGE SYSBP DIABP CURSMOKE CIGPDAY   BMI DIABETES BPMEDS
+   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;
+1   2448     1     195    39  106   70          0       0  27.0        0      0
+2   2448     1     209    52  121   66          0       0  NA          0      0
+3   6238     2     250    46  121   81          0       0  28.7        0      0
+4   6238     2     260    52  105   69.5        0       0  29.4        0      0
+5   6238     2     237    58  108   66          0       0  28.5        0      0
+6   9428     1     245    48  128.  80          1      20  25.3        0      0
+# ℹ 28 more variables: HEARTRTE &lt;dbl&gt;, GLUCOSE &lt;dbl&gt;, educ &lt;dbl&gt;,
+#   PREVCHD &lt;dbl&gt;, PREVAP &lt;dbl&gt;, PREVMI &lt;dbl&gt;, PREVSTRK &lt;dbl&gt;, PREVHYP &lt;dbl&gt;,
+#   TIME &lt;dbl&gt;, PERIOD &lt;dbl&gt;, HDLC &lt;dbl&gt;, LDLC &lt;dbl&gt;, DEATH &lt;dbl&gt;,
+#   ANGINA &lt;dbl&gt;, HOSPMI &lt;dbl&gt;, MI_FCHD &lt;dbl&gt;, ANYCHD &lt;dbl&gt;, STROKE &lt;dbl&gt;,
+#   CVD &lt;dbl&gt;, HYPERTEN &lt;dbl&gt;, TIMEAP &lt;dbl&gt;, TIMEMI &lt;dbl&gt;, TIMEMIFC &lt;dbl&gt;,
+#   TIMECHD &lt;dbl&gt;, TIMESTRK &lt;dbl&gt;, TIMECVD &lt;dbl&gt;, TIMEDTH &lt;dbl&gt;, TIMEHYP &lt;dbl&gt;</code></pre>
+</div>
+</div>
 
 
+<!-- -->
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -246,6 +567,57 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
   function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
@@ -399,7 +771,70 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb12" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Data Gathering"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, message=FALSE, warning=FALSE}</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">### Notes</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>For HW2, accessing health data especially in chronic disease data like diabetes and cancer is quite hard by using APIs, so I won't be using either Python or R APIs to extract data, it is just not worth the time.</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="fu">### [U.S. Chronic Disease Indicators (CDI)](https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi)</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>CDC's Division of Population Health provides cross-cutting set of 124 indicators that were developed by consensus and that allows states and territories and large metropolitan areas to uniformly define, collect, and report chronic disease data that are important to public health practice and available for states, territories and large metropolitan areas. In addition to providing access to state-specific indicator data, the CDI web site serves as a gateway to additional information and data resources.</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, message=FALSE, warning=FALSE}</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>us_chronic <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/U.S._Chronic_Disease_Indicators__CDI_.csv"</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic)</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="fu">### [Alzheimer's Disease and Healthy Aging Data](https://catalog.data.gov/dataset/alzheimers-disease-and-healthy-aging-data)</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>The Alzheimer's Disease and Healthy Aging Data set is a collection of data gathered from the Behavioral Risk Factor Surveillance System (BRFSS) from 2015 to 2021. Published by the Centers for Disease Control and Prevention (CDC), this dataset aims at providing insights into the health and well-being of older adults. The dataset covers various topics including cognitive health, alcohol consumption, falls, caregiver information, dietary habits, obesity, overall health, screenings, smoking, and vaccines.</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, warning=FALSE, message=FALSE}</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>alzheimer <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Alzheimer_s_Disease_and_Healthy_Aging_Data.csv"</span>)</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(alzheimer)</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="fu">### [Behavioral Risk Factor Data: Tobacco Use (2011 to present)](https://catalog.data.gov/dataset/behavioral-risk-factor-data-tobacco-use-2011-to-present)</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>2011-2019. Centers for Disease Control and Prevention (CDC). State Tobacco Activities Tracking and Evaluation (STATE) System. BRFSS Survey Data. The BRFSS is a continuous, state-based surveillance system that collects information about modifiable risk factors for chronic diseases and other leading causes of death. The data for the STATE System were extracted from the annual BRFSS surveys from participating states. Tobacco topics included are cigarette and e-cigarette use prevalence by demographics, cigarette and e-cigarette use frequency, and quit attempts. NOTE: these data are not to be compared with BRFSS data collected 2010 and prior, as the methodologies were changed. Please refer to the FAQs / Methodology sections for more details.</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, warning=FALSE, message=FALSE}</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>smoke <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/Behavioral_Risk_Factor_Data.csv"</span>)</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(smoke)</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a><span class="fu">### [Specific Chronic Conditions)](https://catalog.data.gov/dataset/specific-chronic-conditions-0f448)</span></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>The Select Chronic Conditions dataset provides information on 21 selected chronic conditions among Original Medicare beneficiaries. The dataset contains prevalence, use and spending organized by geography and distinct chronic conditions listed below.</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>• Alcohol Abuse Drug Abuse/ Substance Abuse • Alzheimer's Disease and Related Dementia • Arthritis (Osteoarthritis and Rheumatoid) • Asthma • Atrial Fibrillation • Autism Spectrum Disorders • Cancer (Breast, Colorectal, Lung, and Prostate) • Chronic Kidney Disease • Chronic Obstructive Pulmonary Disease • Depression • Diabetes • Drug Abuse/ Substance Abuse • Heart Failure • Hepatitis (Chronic Viral B &amp; C) • HIV/AIDS • Hyperlipidemia (High cholesterol) • Hypertension (High blood pressure) • Ischemic Heart Disease • Osteoporosis • Schizophrenia and Other Psychotic Disorders • Stroke</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, warning=FALSE, message=FALSE}</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>chronic <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data/CC_R20_P08_v10_D18_WWDSE_Cond (1).csv"</span>)</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(chronic)</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a><span class="fu">### [Framingham Heart Study Longitudinal Data](https://www.framinghamheartstudy.org/fhs-for-researchers/data-available-overview/)</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>The Framingham Heart Study is a long term prospective study of the etiology of cardiovascular disease among a population of free living subjects in the community of Framingham, Massachusetts. The Framingham Heart Study was a landmark study in epidemiology in that it was the first prospective study of cardiovascular disease and identified the concept of risk factors and their joint effects. The study began in 1948 and 5,209 subjects were initially enrolled in the study. Participants have been examined biennially since the inception of the study and all subjects are continuously followed through regular surveillance for cardiovascular outcomes. Clinic examination data has included cardiovascular disease risk factors and markers of disease such as blood pressure, blood chemistry, lung function, smoking history, health behaviors, ECG tracings, Echocardiography, and medication use. Through regular surveillance of area hospitals, participant contact, and death certificates, the Framingham Heart Study reviews and adjudicates events for the occurrence of Angina Pectoris, Myocardial Infarction, Heart Failure, and Cerebrovascular disease.</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, warning=FALSE, message=FALSE}</span></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>heart_study <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/frmgham2.csv"</span>)</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(heart_study)</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 

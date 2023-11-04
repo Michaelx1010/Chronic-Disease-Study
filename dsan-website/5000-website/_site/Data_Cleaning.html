@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -61,7 +95,6 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="materia.scss">
 </head>
 
 <body class="nav-fixed">
@@ -106,12 +139,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Data Cleaning</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./eda/Data_Exploration.qmd" rel="" target="">
+    <a class="nav-link" href="./eda/eda.html" rel="" target="">
  <span class="menu-text">Data Exploration</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./Clustering/Clustering.qmd" rel="" target="">
- <span class="menu-text">Clustering</span></a>
+    <a class="nav-link" href="./clustering/clustering.html" rel="" target="">
+ <span class="menu-text">clustering</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./Dimensionality_reduction.html" rel="" target="">
@@ -141,14 +174,20 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data-cleaning-of-the-u.s.-chronic-disease-indicators-cdi" id="toc-data-cleaning-of-the-u.s.-chronic-disease-indicators-cdi" class="nav-link active" data-scroll-target="#data-cleaning-of-the-u.s.-chronic-disease-indicators-cdi">Data cleaning of the U.S. Chronic Disease Indicators (CDI)</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Data Cleaning</h1>
+<div class="quarto-title-block"><div><h1 class="title">Data Cleaning</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -163,8 +202,352 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="data-cleaning-of-the-u.s.-chronic-disease-indicators-cdi" class="level3">
+<h3 class="anchored" data-anchor-id="data-cleaning-of-the-u.s.-chronic-disease-indicators-cdi">Data cleaning of the <a href="https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi">U.S. Chronic Disease Indicators (CDI)</a></h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Load the data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>us_chronic <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/U.S._Chronic_Disease_Indicators__CDI_.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 1185676 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (19): LocationAbbr, LocationDesc, DataSource, Topic, Question, DataValue...
+dbl  (5): YearStart, YearEnd, DataValueAlt, LowConfidenceLimit, HighConfiden...
+lgl (10): Response, StratificationCategory2, Stratification2, Stratification...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 34
+  YearStart YearEnd LocationAbbr LocationDesc DataSource Topic Question Response
+      &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;    &lt;lgl&gt;   
+1      2010    2010 OR           Oregon       NVSS       Card… Mortali… NA      
+2      2019    2019 AZ           Arizona      YRBSS      Alco… Alcohol… NA      
+3      2019    2019 OH           Ohio         YRBSS      Alco… Alcohol… NA      
+4      2019    2019 US           United Stat… YRBSS      Alco… Alcohol… NA      
+5      2015    2015 VI           Virgin Isla… YRBSS      Alco… Alcohol… NA      
+6      2020    2020 AL           Alabama      PRAMS      Alco… Alcohol… NA      
+# ℹ 26 more variables: DataValueUnit &lt;chr&gt;, DataValueType &lt;chr&gt;,
+#   DataValue &lt;chr&gt;, DataValueAlt &lt;dbl&gt;, DataValueFootnoteSymbol &lt;chr&gt;,
+#   DatavalueFootnote &lt;chr&gt;, LowConfidenceLimit &lt;dbl&gt;,
+#   HighConfidenceLimit &lt;dbl&gt;, StratificationCategory1 &lt;chr&gt;,
+#   Stratification1 &lt;chr&gt;, StratificationCategory2 &lt;lgl&gt;,
+#   Stratification2 &lt;lgl&gt;, StratificationCategory3 &lt;lgl&gt;,
+#   Stratification3 &lt;lgl&gt;, GeoLocation &lt;chr&gt;, ResponseID &lt;lgl&gt;, …</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(us_chronic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,185,676
+Columns: 34
+$ YearStart                 &lt;dbl&gt; 2010, 2019, 2019, 2019, 2015, 2020, 2015, 20…
+$ YearEnd                   &lt;dbl&gt; 2010, 2019, 2019, 2019, 2015, 2020, 2015, 20…
+$ LocationAbbr              &lt;chr&gt; "OR", "AZ", "OH", "US", "VI", "AL", "DE", "F…
+$ LocationDesc              &lt;chr&gt; "Oregon", "Arizona", "Ohio", "United States"…
+$ DataSource                &lt;chr&gt; "NVSS", "YRBSS", "YRBSS", "YRBSS", "YRBSS", …
+$ Topic                     &lt;chr&gt; "Cardiovascular Disease", "Alcohol", "Alcoho…
+$ Question                  &lt;chr&gt; "Mortality from heart failure", "Alcohol use…
+$ Response                  &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ DataValueUnit             &lt;chr&gt; NA, "%", "%", "%", "%", "%", "%", "%", "%", …
+$ DataValueType             &lt;chr&gt; "Number", "Crude Prevalence", "Crude Prevale…
+$ DataValue                 &lt;chr&gt; "30", "29.5", "22.5", "13.9", NA, "59.1", "5…
+$ DataValueAlt              &lt;dbl&gt; 30.0, 29.5, 22.5, 13.9, NA, 59.1, 55.6, 58.1…
+$ DataValueFootnoteSymbol   &lt;chr&gt; NA, NA, NA, NA, "-", NA, NA, NA, NA, "-", NA…
+$ DatavalueFootnote         &lt;chr&gt; NA, NA, NA, NA, "No data available", NA, NA,…
+$ LowConfidenceLimit        &lt;dbl&gt; NA, 24.9, 17.0, 10.4, NA, 53.9, 52.3, 54.2, …
+$ HighConfidenceLimit       &lt;dbl&gt; NA, 34.7, 29.1, 18.4, NA, 64.0, 58.9, 61.8, …
+$ StratificationCategory1   &lt;chr&gt; "Race/Ethnicity", "Gender", "Gender", "Race/…
+$ Stratification1           &lt;chr&gt; "American Indian or Alaska Native", "Female"…
+$ StratificationCategory2   &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ Stratification2           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ StratificationCategory3   &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ Stratification3           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ GeoLocation               &lt;chr&gt; "POINT (-120.15503132599969 44.5674494240004…
+$ ResponseID                &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ LocationID                &lt;chr&gt; "41", "04", "39", "59", "78", "01", "10", "1…
+$ TopicID                   &lt;chr&gt; "CVD", "ALC", "ALC", "ALC", "ALC", "ALC", "A…
+$ QuestionID                &lt;chr&gt; "CVD1_4", "ALC1_1", "ALC1_1", "ALC1_1", "ALC…
+$ DataValueTypeID           &lt;chr&gt; "NMBR", "CRDPREV", "CRDPREV", "CRDPREV", "CR…
+$ StratificationCategoryID1 &lt;chr&gt; "RACE", "GENDER", "GENDER", "RACE", "GENDER"…
+$ StratificationID1         &lt;chr&gt; "AIAN", "GENF", "GENM", "ASN", "GENM", "WHT"…
+$ StratificationCategoryID2 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ StratificationID2         &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ StratificationCategoryID3 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
+$ StratificationID3         &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</code></pre>
+</div>
+</div>
+<ul>
+<li>Checking for different chronic diseases types</li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the categories of different disease incidents</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>us_chronic<span class="sc">$</span>Topic <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(us_chronic<span class="sc">$</span>Topic)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>category <span class="ot">&lt;-</span> <span class="fu">levels</span>(us_chronic<span class="sc">$</span>Topic)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>category</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Alcohol"                                        
+ [2] "Arthritis"                                      
+ [3] "Asthma"                                         
+ [4] "Cancer"                                         
+ [5] "Cardiovascular Disease"                         
+ [6] "Chronic Kidney Disease"                         
+ [7] "Chronic Obstructive Pulmonary Disease"          
+ [8] "Diabetes"                                       
+ [9] "Disability"                                     
+[10] "Immunization"                                   
+[11] "Mental Health"                                  
+[12] "Nutrition, Physical Activity, and Weight Status"
+[13] "Older Adults"                                   
+[14] "Oral Health"                                    
+[15] "Overarching Conditions"                         
+[16] "Reproductive Health"                            
+[17] "Tobacco"                                        </code></pre>
+</div>
+</div>
+<ul>
+<li>Checking for NA columns</li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for NA values in each column</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>na_columns <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(us_chronic))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Display columns with NA values</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(na_columns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                YearStart                   YearEnd              LocationAbbr 
+                        0                         0                         0 
+             LocationDesc                DataSource                     Topic 
+                        0                         0                         0 
+                 Question                  Response             DataValueUnit 
+                        0                   1185676                    152123 
+            DataValueType                 DataValue              DataValueAlt 
+                        0                    378734                    381098 
+  DataValueFootnoteSymbol         DatavalueFootnote        LowConfidenceLimit 
+                   791966                    791966                    503296 
+      HighConfidenceLimit   StratificationCategory1           Stratification1 
+                   503296                         0                         0 
+  StratificationCategory2           Stratification2   StratificationCategory3 
+                  1185676                   1185676                   1185676 
+          Stratification3               GeoLocation                ResponseID 
+                  1185676                     10166                   1185676 
+               LocationID                   TopicID                QuestionID 
+                        0                         0                         0 
+          DataValueTypeID StratificationCategoryID1         StratificationID1 
+                        0                         0                         0 
+StratificationCategoryID2         StratificationID2 StratificationCategoryID3 
+                  1185676                   1185676                   1185676 
+        StratificationID3 
+                  1185676 </code></pre>
+</div>
+</div>
+<p>As we can see, variables StratificationCategory2, Stratification2, StratificationCategory3, Stratification3, ResponseID, StratificationCategoryID2, StratificationID2, StratificationCategoryID3, StratificationID3 are completley filled with NA values. We need to drop the columns with completely NA values.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Drop the columns with completely NA values</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>us_chronic <span class="ot">&lt;-</span> us_chronic[, <span class="fu">colSums</span>(<span class="fu">is.na</span>(us_chronic)) <span class="sc">!=</span> <span class="fu">nrow</span>(us_chronic)]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 24
+  YearStart YearEnd LocationAbbr LocationDesc   DataSource Topic        Question
+      &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;          &lt;chr&gt;      &lt;fct&gt;        &lt;chr&gt;   
+1      2010    2010 OR           Oregon         NVSS       Cardiovascu… Mortali…
+2      2019    2019 AZ           Arizona        YRBSS      Alcohol      Alcohol…
+3      2019    2019 OH           Ohio           YRBSS      Alcohol      Alcohol…
+4      2019    2019 US           United States  YRBSS      Alcohol      Alcohol…
+5      2015    2015 VI           Virgin Islands YRBSS      Alcohol      Alcohol…
+6      2020    2020 AL           Alabama        PRAMS      Alcohol      Alcohol…
+# ℹ 17 more variables: DataValueUnit &lt;chr&gt;, DataValueType &lt;chr&gt;,
+#   DataValue &lt;chr&gt;, DataValueAlt &lt;dbl&gt;, DataValueFootnoteSymbol &lt;chr&gt;,
+#   DatavalueFootnote &lt;chr&gt;, LowConfidenceLimit &lt;dbl&gt;,
+#   HighConfidenceLimit &lt;dbl&gt;, StratificationCategory1 &lt;chr&gt;,
+#   Stratification1 &lt;chr&gt;, GeoLocation &lt;chr&gt;, LocationID &lt;chr&gt;, TopicID &lt;chr&gt;,
+#   QuestionID &lt;chr&gt;, DataValueTypeID &lt;chr&gt;, StratificationCategoryID1 &lt;chr&gt;,
+#   StratificationID1 &lt;chr&gt;</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(us_chronic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,185,676
+Columns: 24
+$ YearStart                 &lt;dbl&gt; 2010, 2019, 2019, 2019, 2015, 2020, 2015, 20…
+$ YearEnd                   &lt;dbl&gt; 2010, 2019, 2019, 2019, 2015, 2020, 2015, 20…
+$ LocationAbbr              &lt;chr&gt; "OR", "AZ", "OH", "US", "VI", "AL", "DE", "F…
+$ LocationDesc              &lt;chr&gt; "Oregon", "Arizona", "Ohio", "United States"…
+$ DataSource                &lt;chr&gt; "NVSS", "YRBSS", "YRBSS", "YRBSS", "YRBSS", …
+$ Topic                     &lt;fct&gt; "Cardiovascular Disease", "Alcohol", "Alcoho…
+$ Question                  &lt;chr&gt; "Mortality from heart failure", "Alcohol use…
+$ DataValueUnit             &lt;chr&gt; NA, "%", "%", "%", "%", "%", "%", "%", "%", …
+$ DataValueType             &lt;chr&gt; "Number", "Crude Prevalence", "Crude Prevale…
+$ DataValue                 &lt;chr&gt; "30", "29.5", "22.5", "13.9", NA, "59.1", "5…
+$ DataValueAlt              &lt;dbl&gt; 30.0, 29.5, 22.5, 13.9, NA, 59.1, 55.6, 58.1…
+$ DataValueFootnoteSymbol   &lt;chr&gt; NA, NA, NA, NA, "-", NA, NA, NA, NA, "-", NA…
+$ DatavalueFootnote         &lt;chr&gt; NA, NA, NA, NA, "No data available", NA, NA,…
+$ LowConfidenceLimit        &lt;dbl&gt; NA, 24.9, 17.0, 10.4, NA, 53.9, 52.3, 54.2, …
+$ HighConfidenceLimit       &lt;dbl&gt; NA, 34.7, 29.1, 18.4, NA, 64.0, 58.9, 61.8, …
+$ StratificationCategory1   &lt;chr&gt; "Race/Ethnicity", "Gender", "Gender", "Race/…
+$ Stratification1           &lt;chr&gt; "American Indian or Alaska Native", "Female"…
+$ GeoLocation               &lt;chr&gt; "POINT (-120.15503132599969 44.5674494240004…
+$ LocationID                &lt;chr&gt; "41", "04", "39", "59", "78", "01", "10", "1…
+$ TopicID                   &lt;chr&gt; "CVD", "ALC", "ALC", "ALC", "ALC", "ALC", "A…
+$ QuestionID                &lt;chr&gt; "CVD1_4", "ALC1_1", "ALC1_1", "ALC1_1", "ALC…
+$ DataValueTypeID           &lt;chr&gt; "NMBR", "CRDPREV", "CRDPREV", "CRDPREV", "CR…
+$ StratificationCategoryID1 &lt;chr&gt; "RACE", "GENDER", "GENDER", "RACE", "GENDER"…
+$ StratificationID1         &lt;chr&gt; "AIAN", "GENF", "GENM", "ASN", "GENM", "WHT"…</code></pre>
+</div>
+</div>
+<ul>
+<li>Transforming data to tidy</li>
+</ul>
+<p>Let’s first look at what is inside StratificationCategory1 and Stratification1.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Loop through each unique category</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>types_s <span class="ot">&lt;-</span> <span class="fu">unique</span>(us_chronic<span class="sc">$</span>StratificationCategory1)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> types_s) {</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Category:"</span>, i, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get unique Types for the current category</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  types <span class="ot">&lt;-</span> <span class="fu">unique</span>(us_chronic<span class="sc">$</span>Stratification1[us_chronic<span class="sc">$</span>StratificationCategory1 <span class="sc">==</span> i])</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a> <span class="co"># Print unique types</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a> <span class="fu">cat</span>(<span class="st">"Types:</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">paste</span>(types, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Category: Race/Ethnicity 
+Types:
+ American Indian or Alaska Native
+Asian, non-Hispanic
+White, non-Hispanic
+Hispanic
+Black, non-Hispanic
+Asian or Pacific Islander
+Multiracial, non-Hispanic
+Other, non-Hispanic 
+
+Category: Gender 
+Types:
+ Female
+Male 
+
+Category: Overall 
+Types:
+ Overall </code></pre>
+</div>
+</div>
+<p>In order to transform data to tidy, I need three column variables specify Race, Gender and Overall.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>us_chronic_tidy <span class="ot">&lt;-</span> us_chronic <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Race =</span> <span class="fu">ifelse</span>(StratificationCategory1 <span class="sc">==</span> <span class="st">"Race/Ethnicity"</span>, Stratification1, <span class="cn">NA</span>),</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">Gender =</span> <span class="fu">ifelse</span>(StratificationCategory1 <span class="sc">==</span> <span class="st">"Gender"</span>, Stratification1, <span class="cn">NA</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">Overall =</span> <span class="fu">ifelse</span>(StratificationCategory1 <span class="sc">==</span> <span class="st">"Overall"</span>, Stratification1, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>StratificationCategory1, <span class="sc">-</span>Stratification1) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RaceID =</span> <span class="fu">ifelse</span>(StratificationCategoryID1 <span class="sc">==</span> <span class="st">"RACE"</span>, StratificationID1, <span class="cn">NA</span>),</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">GenderID =</span> <span class="fu">ifelse</span>(StratificationCategoryID1 <span class="sc">==</span> <span class="st">"GENDER"</span>, StratificationID1, <span class="cn">NA</span>),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">OverallID =</span> <span class="fu">ifelse</span>(StratificationCategoryID1 <span class="sc">==</span> <span class="st">"OVERALL"</span>, StratificationID1, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>StratificationCategoryID1, <span class="sc">-</span>StratificationID1)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># View the resulting tidy dataset</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic_tidy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 26
+  YearStart YearEnd LocationAbbr LocationDesc   DataSource Topic        Question
+      &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;          &lt;chr&gt;      &lt;fct&gt;        &lt;chr&gt;   
+1      2010    2010 OR           Oregon         NVSS       Cardiovascu… Mortali…
+2      2019    2019 AZ           Arizona        YRBSS      Alcohol      Alcohol…
+3      2019    2019 OH           Ohio           YRBSS      Alcohol      Alcohol…
+4      2019    2019 US           United States  YRBSS      Alcohol      Alcohol…
+5      2015    2015 VI           Virgin Islands YRBSS      Alcohol      Alcohol…
+6      2020    2020 AL           Alabama        PRAMS      Alcohol      Alcohol…
+# ℹ 19 more variables: DataValueUnit &lt;chr&gt;, DataValueType &lt;chr&gt;,
+#   DataValue &lt;chr&gt;, DataValueAlt &lt;dbl&gt;, DataValueFootnoteSymbol &lt;chr&gt;,
+#   DatavalueFootnote &lt;chr&gt;, LowConfidenceLimit &lt;dbl&gt;,
+#   HighConfidenceLimit &lt;dbl&gt;, GeoLocation &lt;chr&gt;, LocationID &lt;chr&gt;,
+#   TopicID &lt;chr&gt;, QuestionID &lt;chr&gt;, DataValueTypeID &lt;chr&gt;, Race &lt;chr&gt;,
+#   Gender &lt;chr&gt;, Overall &lt;chr&gt;, RaceID &lt;chr&gt;, GenderID &lt;chr&gt;, OverallID &lt;chr&gt;</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(us_chronic_tidy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,185,676
+Columns: 26
+$ YearStart               &lt;dbl&gt; 2010, 2019, 2019, 2019, 2015, 2020, 2015, 2019…
+$ YearEnd                 &lt;dbl&gt; 2010, 2019, 2019, 2019, 2015, 2020, 2015, 2019…
+$ LocationAbbr            &lt;chr&gt; "OR", "AZ", "OH", "US", "VI", "AL", "DE", "FL"…
+$ LocationDesc            &lt;chr&gt; "Oregon", "Arizona", "Ohio", "United States", …
+$ DataSource              &lt;chr&gt; "NVSS", "YRBSS", "YRBSS", "YRBSS", "YRBSS", "P…
+$ Topic                   &lt;fct&gt; "Cardiovascular Disease", "Alcohol", "Alcohol"…
+$ Question                &lt;chr&gt; "Mortality from heart failure", "Alcohol use a…
+$ DataValueUnit           &lt;chr&gt; NA, "%", "%", "%", "%", "%", "%", "%", "%", "%…
+$ DataValueType           &lt;chr&gt; "Number", "Crude Prevalence", "Crude Prevalenc…
+$ DataValue               &lt;chr&gt; "30", "29.5", "22.5", "13.9", NA, "59.1", "55.…
+$ DataValueAlt            &lt;dbl&gt; 30.0, 29.5, 22.5, 13.9, NA, 59.1, 55.6, 58.1, …
+$ DataValueFootnoteSymbol &lt;chr&gt; NA, NA, NA, NA, "-", NA, NA, NA, NA, "-", NA, …
+$ DatavalueFootnote       &lt;chr&gt; NA, NA, NA, NA, "No data available", NA, NA, N…
+$ LowConfidenceLimit      &lt;dbl&gt; NA, 24.9, 17.0, 10.4, NA, 53.9, 52.3, 54.2, 58…
+$ HighConfidenceLimit     &lt;dbl&gt; NA, 34.7, 29.1, 18.4, NA, 64.0, 58.9, 61.8, 66…
+$ GeoLocation             &lt;chr&gt; "POINT (-120.15503132599969 44.56744942400047)…
+$ LocationID              &lt;chr&gt; "41", "04", "39", "59", "78", "01", "10", "12"…
+$ TopicID                 &lt;chr&gt; "CVD", "ALC", "ALC", "ALC", "ALC", "ALC", "ALC…
+$ QuestionID              &lt;chr&gt; "CVD1_4", "ALC1_1", "ALC1_1", "ALC1_1", "ALC1_…
+$ DataValueTypeID         &lt;chr&gt; "NMBR", "CRDPREV", "CRDPREV", "CRDPREV", "CRDP…
+$ Race                    &lt;chr&gt; "American Indian or Alaska Native", NA, NA, "A…
+$ Gender                  &lt;chr&gt; NA, "Female", "Male", NA, "Male", NA, NA, NA, …
+$ Overall                 &lt;chr&gt; NA, NA, NA, NA, NA, NA, "Overall", "Overall", …
+$ RaceID                  &lt;chr&gt; "AIAN", NA, NA, "ASN", NA, "WHT", NA, NA, NA, …
+$ GenderID                &lt;chr&gt; NA, "GENF", "GENM", NA, "GENM", NA, NA, NA, NA…
+$ OverallID               &lt;chr&gt; NA, NA, NA, NA, NA, NA, "OVR", "OVR", "OVR", "…</code></pre>
+</div>
+</div>
+<ul>
+<li>Save the cleaned data</li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(us_chronic_tidy,<span class="at">file=</span><span class="st">'data/us_chronic.csv'</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 
 
+<!-- -->
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -246,6 +629,57 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
   function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
@@ -399,7 +833,94 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 });
-</script>
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb23" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Data Cleaning"</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, message=FALSE, warning=FALSE}</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data cleaning of the [U.S. Chronic Disease Indicators (CDI)](https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi)</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Load the data</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>us_chronic <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/U.S._Chronic_Disease_Indicators__CDI_.csv"</span>)</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic)</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(us_chronic)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Checking for different chronic diseases types</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the categories of different disease incidents</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>us_chronic<span class="sc">$</span>Topic <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(us_chronic<span class="sc">$</span>Topic)</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>category <span class="ot">&lt;-</span> <span class="fu">levels</span>(us_chronic<span class="sc">$</span>Topic)</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>category</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Checking for NA columns</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for NA values in each column</span></span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>na_columns <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(us_chronic))</span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Display columns with NA values</span></span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(na_columns)</span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>As we can see, variables StratificationCategory2, Stratification2, StratificationCategory3, Stratification3, ResponseID, StratificationCategoryID2, StratificationID2, StratificationCategoryID3, StratificationID3 are completley filled with NA values. We need to drop the columns with completely NA values.</span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a><span class="co">#Drop the columns with completely NA values</span></span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>us_chronic <span class="ot">&lt;-</span> us_chronic[, <span class="fu">colSums</span>(<span class="fu">is.na</span>(us_chronic)) <span class="sc">!=</span> <span class="fu">nrow</span>(us_chronic)]</span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic)</span>
+<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(us_chronic)</span>
+<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Transforming data to tidy</span>
+<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a>Let's first look at what is inside StratificationCategory1 and Stratification1.</span>
+<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a><span class="co">#Loop through each unique category</span></span>
+<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a>types_s <span class="ot">&lt;-</span> <span class="fu">unique</span>(us_chronic<span class="sc">$</span>StratificationCategory1)</span>
+<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> types_s) {</span>
+<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Category:"</span>, i, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a><span class="co"># Get unique Types for the current category</span></span>
+<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a>  types <span class="ot">&lt;-</span> <span class="fu">unique</span>(us_chronic<span class="sc">$</span>Stratification1[us_chronic<span class="sc">$</span>StratificationCategory1 <span class="sc">==</span> i])</span>
+<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a> <span class="co"># Print unique types</span></span>
+<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a> <span class="fu">cat</span>(<span class="st">"Types:</span><span class="sc">\n</span><span class="st">"</span>, <span class="fu">paste</span>(types, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a>In order to transform data to tidy, I need three column variables specify Race, Gender and Overall.</span>
+<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-75"><a href="#cb23-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a>us_chronic_tidy <span class="ot">&lt;-</span> us_chronic <span class="sc">%&gt;%</span></span>
+<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Race =</span> <span class="fu">ifelse</span>(StratificationCategory1 <span class="sc">==</span> <span class="st">"Race/Ethnicity"</span>, Stratification1, <span class="cn">NA</span>),</span>
+<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a>         <span class="at">Gender =</span> <span class="fu">ifelse</span>(StratificationCategory1 <span class="sc">==</span> <span class="st">"Gender"</span>, Stratification1, <span class="cn">NA</span>),</span>
+<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a>         <span class="at">Overall =</span> <span class="fu">ifelse</span>(StratificationCategory1 <span class="sc">==</span> <span class="st">"Overall"</span>, Stratification1, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-81"><a href="#cb23-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>StratificationCategory1, <span class="sc">-</span>Stratification1) <span class="sc">%&gt;%</span></span>
+<span id="cb23-82"><a href="#cb23-82" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RaceID =</span> <span class="fu">ifelse</span>(StratificationCategoryID1 <span class="sc">==</span> <span class="st">"RACE"</span>, StratificationID1, <span class="cn">NA</span>),</span>
+<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a>         <span class="at">GenderID =</span> <span class="fu">ifelse</span>(StratificationCategoryID1 <span class="sc">==</span> <span class="st">"GENDER"</span>, StratificationID1, <span class="cn">NA</span>),</span>
+<span id="cb23-85"><a href="#cb23-85" aria-hidden="true" tabindex="-1"></a>         <span class="at">OverallID =</span> <span class="fu">ifelse</span>(StratificationCategoryID1 <span class="sc">==</span> <span class="st">"OVERALL"</span>, StratificationID1, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-86"><a href="#cb23-86" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-87"><a href="#cb23-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>StratificationCategoryID1, <span class="sc">-</span>StratificationID1)</span>
+<span id="cb23-88"><a href="#cb23-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-89"><a href="#cb23-89" aria-hidden="true" tabindex="-1"></a><span class="co"># View the resulting tidy dataset</span></span>
+<span id="cb23-90"><a href="#cb23-90" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(us_chronic_tidy)</span>
+<span id="cb23-91"><a href="#cb23-91" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(us_chronic_tidy)</span>
+<span id="cb23-92"><a href="#cb23-92" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-93"><a href="#cb23-93" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Save the cleaned data</span>
+<span id="cb23-94"><a href="#cb23-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-97"><a href="#cb23-97" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-98"><a href="#cb23-98" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(us_chronic_tidy,<span class="at">file=</span><span class="st">'data/us_chronic.csv'</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>) </span>
+<span id="cb23-99"><a href="#cb23-99" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
 </div> <!-- /content -->
 
 
