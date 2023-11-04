@@ -16,13 +16,13 @@ bibliography: references.bib
 
 ### Questions to answer:
 
-1. What are the risk factors(including lifestyles, diets, enviromental factors, genetics, etc) that contributes to T2D? In other words, what factors have strong statitical correlation with the incidence of T2D.
-2. What risk factors have less correlation with T2D?
-3. Among the risk factors that have strong correlation with T2D, which one has the highest correlation?
-4. Among the risk factors that have less correlation with T2D, which one has the least correlation?
-5. What types of predictive has the best estimate an individual's risk of developing T2D? 
-6. Are there early signs that can be detected through regression analysis, allowing for the early diagnosis of T2D?
-7. Can we develop accurate predictive models for blood glucose levels in T2D patients to help with insulin dosage and meal planning?
-8. Can we use machine learning or time-series models to detect early signs of cancer?
-9. What are the risk factors associated with specific types of cancer? How do genetic, lifestyle, environmental, and demographic factors contribute to cancer development?
+1.  What are the risk factors(including lifestyles, diets, enviromental factors, genetics, etc) that contributes to T2D? In other words, what factors have strong statitical correlation with the incidence of T2D.
+2.  What risk factors have less correlation with T2D?
+3.  Among the risk factors that have strong correlation with T2D, which one has the highest correlation?
+4.  Among the risk factors that have less correlation with T2D, which one has the least correlation?
+5.  What types of predictive has the best estimate an individual's risk of developing T2D?
+6.  Are there early signs that can be detected through regression analysis, allowing for the early diagnosis of T2D?
+7.  Can we develop accurate predictive models for blood glucose levels in T2D patients to help with insulin dosage and meal planning?
+8.  Can we use machine learning or time-series models to detect early signs of cancer?
+9.  What are the risk factors associated with specific types of cancer? How do genetic, lifestyle, environmental, and demographic factors contribute to cancer development?
 10. How can data visualization effectively communicate information of chronic diseases.
