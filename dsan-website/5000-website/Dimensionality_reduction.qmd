@@ -1,1 +1,205 @@
+---
+title: Dimensionality reduction
+format:
+  html:
+    code-fold: true
+    code-tools: true
+bibliography: references.bib
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo = TRUE,
+    message = FALSE,
+    warning = FALSE)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+#Loading required packages
+library(RANN)
+library(caret)
+library(mice)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(ggthemes)
+library(DT)
+library(ggfortify)
+library(Rtsne)
+```
+
+
+# IMPORTANT NOTES
+
+I cannot use python for now in VScode for now due to the limitations of data set size in VScode, it is quite challenging to handle my data in VScode. I will update a python version after figuring out a solution, for now, I will be using R for this assignment, utilizing "prcomp()" function for PCA Analysis, and "Rstne" package for t-SNE analysis.
+
+## Introduction
+
+In the realm of data science and chronic diseases, one of the most pressing challenges is dealing with high-dimensional datasets that contain a multitude of variables and features. Dimensionality reduction techniques enabling us to distill valuable insights from complex data while mitigating computational burdens. In this coding section of our chronic diseases data science project, we employ dimensionality reduction methods that will not only streamline our analyses but also uncover hidden patterns, contribute to the development of more effective strategies for disease prevention and management. By utilizing the power of these techniques, we advance our understanding and ability to address these critical public health concerns. For this part, I will be using the Framingham heart study data set.
+
+
+## Data preparation
+
+```{r}
+#Load the framingham heart study data set
+data <- read_csv("data/frmgham2.csv")
+head(data)
+glimpse(data)
+```
+
+- This Framingham Heart study data set contains 39 features, applying dimensionality reduction could be useful in this case.
+
+### Missing data
+
+```{r}
+# Check for missing data
+sum(is.na(data))
+```
+
+```{r}
+data %>% 
+  summarise_all(~sum(is.na(.)))
+```
+```{r}
+# Check for missing data percentages
+data %>% 
+  summarise_all(~sum(is.na(.))/nrow(data))
+```
+
+```{r}
+# Drop data columns that has over 50% of missing data
+threshold <- 0.5
+
+# Calculate the percentage of missing values for each column
+missing_percentages <- colMeans(is.na(data))
+
+# Identify columns that exceed the threshold
+columns_to_drop <- names(data)[missing_percentages > threshold]
+
+# Drop the identified columns from the dataframe
+data <- data %>% select(-(columns_to_drop))
+
+head(data)
+```
+```{r}
+# Check for missing data percentages
+data %>% 
+  summarise_all(~sum(is.na(.))/nrow(data))
+```
+```{r}
+# Remove the missing data directly since the percentagies of missing values are low
+data <- na.omit(data)
+
+sum(is.na(data))
+
+```
+
+## PCA method
+
+```{r}
+# Scale the data
+data_scaled <- scale(data)
+
+# Apply PCA
+pca_result <- prcomp(data_scaled, center = TRUE, scale. = TRUE)
+
+# Summary of PCA results
+summary(pca_result)
+
+# Plot the PCA results
+plot(pca_result)
+abline(v = 1:37, col = "lightgray", lty = 2)
+axis(1, at = 1:37, labels = TRUE)
+```
+
+### PCA Biplot visualization
+
+```{r}
+loadings <- data.frame(pca_result$rotation)
+
+p <- ggplot() +
+  geom_segment(data = loadings, aes(x = 0, y = 0, xend = PC1, yend = PC2), arrow = arrow(length = unit(0.02, "npc")), color = 'red') +
+  geom_text(data = loadings, aes(x = PC1, y = PC2, label = rownames(loadings)), hjust = 1.2, vjust = 1.2) +
+  theme_minimal() +
+  labs(x = "First Principal Component", y = "Second Principal Component", title = "PCA Loadings Biplot") +
+  coord_equal() 
+
+p + theme(
+  plot.title = element_text(size = 20),  
+  axis.text = element_text(size = 14),  
+  axis.title = element_text(size = 16)
+)
+```
+
+
+
+- For the cardiovascular diseases study, while principal components beyond the tenth account for less than 3% of the variance individually, dropping these variables based solely on PCA results may not be optimal. The PCA is utilized here primarily as a methodological illustration, serving to highlight potential areas for dimensionality reduction. It is crucial to consider the clinical significance and relevance of each variable before making decisions about their exclusion, ensuring that essential data pertinent to cardiovascular research is retained.
+
+- The PCA biplot reveals that variables such as DIABP (diastolic blood pressure), AGE, HYPERTEN (hypertension), SYSBP (systolic blood pressure), and PREVHYP (previous hypertension) have a pronounced influence on the first principal component. Conversely, variables like CURSMOKE (current smoker status), CIGPDAY (cigarettes per day), and TIMEHYP (time to hypertension development) exert a significant impact on the second principal component. This distinction provided by PCA enables us to ascertain the relative importance of different features, a task that becomes increasingly difficult as the dimensionality of the dataset grows. The PCA analysis effectively reduces the complexity of the data, allowing for a more manageable interpretation of the key features.
+
+## t-SNE method
+
+```{r, message=FALSE, warning=FALSE}
+# Run t-SNE with a range of perplexity values
+perplexities <- c(5, 30, 50, 100)
+for (perplexity in perplexities) {
+  set.seed(42)
+  tsne_results <- Rtsne(data_scaled, dims = 2, perplexity = perplexity, verbose = TRUE)
+  
+# Create a data frame for plotting
+  tsne_data <- data.frame(tsne_results$Y)
+  colnames(tsne_data) <- c("TSNE1", "TSNE2")
+  
+# Plot the t-SNE outputs
+  p <- ggplot(tsne_data, aes(x = TSNE1, y = TSNE2)) +
+    geom_point() +
+    ggtitle(paste("t-SNE with Perplexity", perplexity))
+  
+  print(p)
+}
+```
+
+
+1. Perplexity 5: At 5 perplexity, t-SNE focuses more on local structure. The clusters are dispersed and less distinctly separated. This could suggest that when considering only close neighbors, the data has many local groupings but without clear global structure.
+
+2. Perplexity 30: At 30 perplexity, it provides a balance between local and global structures of the data. The clusters appear  better separated than with perplexity 5, indicating that the algorithm is now considering more distant points when creating the visualization, leading to a clearer global structure.
+
+3. Perplexity 50: With further increased perplexity, the clusters maintain their separation and some of the denser clusters appear to merge. This suggests that at this level of perplexity, the algorithm is smoothing over some of the finer local structures in favor of broader data trends.
+
+4. Perplexity 100: At a high perplexity level of 100, the clusters become even less distinct with more overlap between them. This can be an indication that the balance has reached  too far towards global structure.
+
+### PCA/t-SNE Comparison
+
+```{r}
+pca_data <- data.frame(pca_result$x)
+ggplot(pca_data, aes(x = PC1, y = PC2)) +
+  geom_point() +
+  ggtitle("PCA Results")
+```
+
+- By comparing the PCA and t-SNE results, the PCA plot reveals a pronounced linear dispersion along the primary principal component (PC1), with a less defined spread along the secondary principal component (PC2). This suggests that PC1 accounts for a substantial part of the data's variance. Unlike t-SNE, the PCA does not seem to capture distinct local clusters, indicating a limitation in highlighting non-linear relationships within the dataset. In contrast, t-SNE demonstrates its strength in revealing local clusters, suggesting that it can discern intricate non-linear patterns that PCA cannot detect.
+
+
+## Evaluation
+
+1. PCA analysis is good at discerning linear relationships within high-dimensional data, offering a global view that highlights the directions of greatest variance. In contrast, t-SNE is good at detecting non-linear patterns, such as local and global clusters, which are evident in its visualizations that distinctly reveal data groupings. 
+
+2. A important observation during my coding is that the computational intensity of t-SNE, which often results in longer processing times compared to PCA. The choice between PCA and t-SNE for dimensionality reduction should be informed by the specific objectives of the analysis. PCA is typically preferred for its interpretability and efficiency, particularly when identifying the main axes of variation is crucial. t-SNE is more suited for exploratory data analysis where the focus is on identifying complex structures and patterns within the data. Understanding the context and desired outcomes is essential when selecting the appropriate method for a given dataset.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

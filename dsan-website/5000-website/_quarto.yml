@@ -17,6 +17,9 @@ website:
       - href: Data.qmd
         text: Data
         
+      - href: Naïve_Bayes.qmd
+        text: Naïve_Bayes
+        
       - href: Introduction.qmd
         text: Introduction
         
@@ -26,10 +29,10 @@ website:
       - href: Data_Cleaning.qmd
         text: Data Cleaning
         
-      - href: eda/eda.ipynb
+      - href: eda/eda.qmd
         text: Data Exploration
         
-      - href: clustering/clustering.qmd
+      - href: clustering.qmd
         text: clustering
         
       - href: Dimensionality_reduction.qmd

@@ -1,0 +1,336 @@
+---
+title: "Clustering"
+format:
+  html:
+    code-fold: true
+    code-tools: true
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo = TRUE,
+    message = FALSE,
+    warning = FALSE)
+```
+
+```{r, message=FALSE, warning=FALSE}
+#Loading required packages
+library(RANN)
+library(caret)
+library(mice)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(ggthemes)
+library(DT)
+library(ggfortify)
+library(Rtsne)
+library(cluster)
+library(factoextra)
+library(fpc)
+library(dbscan)
+```
+
+# IMPORTANT NOTES
+
+I cannot use python for now in VScode for now due to the limitations of data set size in VScode, it is quite challenging to handle my data in VScode, and it is obviously harder to do it in R since we do have lots of coding examples from class.
+
+## Introduction
+
+In the field of chronic diseases research, understanding complex diseases like diabetes often involves discerning hidden patterns in data. This project utilizes clustering techniques, specifically K-Means, DBSCAN, and Hierarchical clustering, to analyze Diabetes from the Framingham Heart Study @RProjectFramingham. The use of these diverse methods allows for a comprehensive exploration of diabetes prediction and understanding. Each method, with its unique approach, helps in identifying distinct groups and complex relationships among various factors. By focusing on diabetes as the core subject, this analysis aims to decode how different risk factors, demographics, and lifestyle choices intersect, contributing to the disease's development and progression.
+
+## Theory
+
+### K Means Clustering
+
+-   K-means clustering divides data into k distinct groups. Initially, it randomly selects centroids from the data, which are like central points for each group. Data points are then grouped with the nearest centroid, forming initial clusters. After this, the average position of all the points in each cluster is calculated, creating new centroids. This process of assigning data points to the nearest centroid and recalculating the centroids is repeated until the clusters stabilize, usually meaning they don't change much between iterations.
+
+For evaluating how well the clustering worked, two common methods are the Elbow Method and Silhouette Analysis. The Elbow Method helps to choose a suitable number of clusters (k). It involves plotting the Sum of Squared Distances also known as inertia between data points and their respective cluster centroids against a range of k values. The elbow point, where the rate of decrease sharply changes, suggests a good number of clusters. On the other hand, Silhouette Analysis measures how similar a data point is to its own cluster compared to other clusters. It helps understand how well-separated the clusters are, with higher silhouette scores indicating better-defined clusters. @Dabbura2023
+
+### DBSAN
+
+-   DBSCAN looks at clustering from a density point of view. It groups points that are closely packed together, marking points that are too far from any cluster as outliers. The process starts by picking a point and finding all points within a certain distance, then a cluster is formed if there are enough pints. DBSCAN then checks the points around these new points, expanding the cluster if necessary. This method is particularly useful for data with irregular shapes. The key parameters are the maximum distance (also know as eps which is the radius of the neighborhood around each data point.) between points to be considered neighbors and the minimum number of points to form a dense region. Unlike K-Means, specifying the number of clusters is not required.
+
+-   For evaluating DBSCAN, using the Silhouette score is more appropriate than the Elbow method. The Elbow method is typically used for K Means Clustering where you need to determine the optimal number of clusters. In contrast, DBSCAN does not require specifying the number of clusters. The Silhouette score, which measures the quality of clusters by how well-separated they are, is suitable for evaluating the model performance of DBSCAN.
+
+### Hierarchical clustering
+
+-   Hierarchical clustering builds a tree of clusters by progressively linking together data points or existing clusters. Initially, each point is a cluster. The closest pairs of points (or clusters) are then merged into new clusters. This process is repeated, gradually forming larger clusters. The result can be visualized as a tree or dendrogram, showing the hierarchy of clustering, it is simlilar to the structure of a decision tree. An advantage of hierarchical clustering is that we don't need to decide the number of clusters in advance. We can choose the number of clusters by chopping the dendrogram at the desired level.
+
+-   For hierarchical clustering, the Silhouette score is a better method. While the Elbow method is useful for algorithms like K-means where you need to predetermine the number of clusters, hierarchical clustering provides a tree-like structure of data. The Silhouette score can help in determining the quality of the clusters formed at different levels. This method offers a clear insight into the distinctiveness of the clusters formed.
+
+## Methods
+
+### Data preparation
+
+```{r}
+#Load the framingham heart study data set
+data <- read_csv("data/frmgham2.csv")
+head(data)
+glimpse(data)
+```
+
+```{r}
+# Check for missing data
+sum(is.na(data))
+```
+
+```{r}
+data %>% 
+  summarise_all(~sum(is.na(.)))
+```
+
+```{r}
+# Check for missing data percentages
+data %>% 
+  summarise_all(~sum(is.na(.))/nrow(data))
+```
+
+```{r}
+# Drop data columns that has over 50% of missing data
+threshold <- 0.5
+
+# Calculate the percentage of missing values for each column
+missing_percentages <- colMeans(is.na(data))
+
+# Identify columns that exceed the threshold
+columns_to_drop <- names(data)[missing_percentages > threshold]
+
+# Drop the identified columns from the dataframe
+data <- data %>% select(-(columns_to_drop))
+
+data <- na.omit(data)
+
+target <- data$DIABETES
+
+# Remove the 'DIABETES' column
+data <- data %>% select(-DIABETES)
+
+# Function to check if a column is binary
+is_binary <- function(column) {
+  unique_values <- unique(column)
+  length(unique_values) == 2 && all(unique_values %in% c(0, 1))
+}
+
+# Identify binary columns
+binary_columns <- sapply(data, is_binary)
+
+# Remove binary columns from the data frame
+data <- data[, !binary_columns]
+
+# Remove the first two columns
+
+data <- data %>%
+  select(-RANDID, -SEX)
+
+glimpse(data)
+```
+
+### K Means Clustering
+
+-   Elbow Method
+
+```{r}
+# Normalize data
+data_n <- scale(data)
+
+# Elbow Method
+inertia <- numeric(10)
+for(k in 1:10){
+  model <- kmeans(data_n, centers = k)
+  inertia[k] <- model$tot.withinss
+}
+
+# Create a data frame for plotting
+elbow_df <- data.frame(k = 1:10, Inertia = inertia)
+
+# Plot using ggplot
+ggplot(elbow_df, aes(x = k, y = Inertia)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Elbow Method for Optimal K", x = "Number of Clusters", y = "Inertia")
+```
+
+-   Silhouette Method
+
+```{r}
+sil_width <- numeric(10)
+for(k in 2:10){
+  model <- kmeans(data_n, centers = k)
+  sil_width[k] <- mean(silhouette(model$cluster, dist(data))[, 3])
+}
+
+# Create a data frame for plotting
+silhouette_df <- data.frame(k = 2:10, SilhouetteWidth = sil_width[-1])
+
+# Plot using ggplot
+ggplot(silhouette_df, aes(x = k, y = SilhouetteWidth)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Silhouette Method for Optimal K", x = "Number of Clusters", y = "Silhouette")
+```
+
+-   Interpretation
+
+As we can see from the both of the plots, K=4 would be an optimal clusters value based on the elbow method, as it the inertia tend to get stabilized after k=4. From the Silhouette method, the resulting plot indicates that k=2 is the optimal k since, it has the highest Silhouette value, indicating a well formed clustering structure. Overall, I pick k=2 since at k=2, it is optimal for a binary target outcome.
+
+-   Final Results for optimal K of K-Means
+
+```{r}
+k <- 2
+
+data_k <- data
+
+# Run K-means with the k = 2
+final_model <- kmeans(data_n, centers = k)
+
+# Adding cluster assignments to the data
+data_k$cluster <- final_model$cluster
+data_k$cluster <- ifelse(data_k$cluster == 1, 0, 1)
+data_k$Target <- target
+table <- table(Cluster = data_k$cluster, Target = target)
+table
+
+# Calculate the purity of clusters
+purity <- sum(apply(table, 1, max)) / nrow(data_k)
+print(paste("Purity is: ", purity))
+
+# Perform PCA on the dataset for results visualization
+pca_res <- prcomp(data_k[, -which(names(data_k) %in% c("cluster", "Target"))], scale. = TRUE)
+data_pca <- as.data.frame(pca_res$x)
+data_pca$cluster <- as.factor(data_k$cluster)
+
+# Plot the first two principal components with ggplot2
+p <- ggplot(data_pca, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(alpha = 0.5) + 
+  theme_minimal() +
+  labs(title = "Cluster Visualization on PCA-reduced Data", color = "Cluster") +
+  xlab("PC1") +
+  ylab("PC2") +
+  scale_color_discrete(name = "Cluster")  
+p
+```
+
+-   Summary
+
+The purity measure is about 0.9578, which is pretty high. This means that the groupings created by the K-means algorithm match up well with the Diabetes binary target variable.
+
+### DBSCAN
+
+```{r}
+# Normalize data
+data_n <- scale(data)
+
+eps_values <- seq(0.1, 2, by = 0.1) 
+sil_scores <- c()
+
+for (eps in eps_values) {
+  dbscan_res <- dbscan(data_n, eps = eps, minPts = 4)
+  if (max(dbscan_res$cluster) > 1) { 
+    sil_score <- silhouette(dbscan_res$cluster, dist(data))
+    sil_scores <- c(sil_scores, mean(sil_score[, "sil_width"]))
+  } else {
+    sil_scores <- c(sil_scores, NA) 
+  }
+}
+
+# The optimal eps corresponds to the highest silhouette score
+optimal_eps <- eps_values[which.max(sil_scores)]
+optimal_eps
+
+# Create a dataframe for plotting
+plot_data <- data.frame(eps = eps_values, silhouette = sil_scores)
+
+# Plot silhouette scores against eps values
+ggplot(plot_data, aes(x = eps, y = silhouette)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Silhouette method for Different eps Values", x = "eps", y = "Silhouette")
+
+
+```
+
+-   Interpretation
+
+Based on the model hyperparameters tuning for DBSCAN, the optimal parameter for eps is 0.7.
+
+-   Final Results for optimal eps for DBSCAN
+
+```{r}
+data_d <- data
+
+optimal_eps <- 0.7
+dbscan_result <- dbscan(data_n, eps = optimal_eps, minPts = 4)
+
+# Compare the DBSCAN clusters with DIABETES
+data_d$target <- target
+data_d$cluster <- dbscan_result$cluster
+comparison_table <- table(Cluster = data_d$cluster, Target = data_d$target)
+print(comparison_table)
+
+# Calculate the purity of clusters
+purity <- sum(apply(comparison_table, 1, max)) / nrow(data_d)
+print(paste("Purity of clusters:", purity))
+```
+
+-   Summary
+
+The purity measure is about 0.9578, which is pretty high. This means that the groupings created by the DBSCAN algorithm match up well with the Diabetes binary target variable.
+
+### Hierarchical clustering
+
+```{r}
+# Perform hierarchical clustering 
+h <- hclust(dist(data_n), method = "ward.D2")
+
+# Draw the dendrogram
+plot(h, main = "Hierarchical Clustering", sub = "", xlab = "")
+```
+
+```{r}
+sil <- sapply(2:10, function(k) {
+  c <- cutree(h, k)
+  mean(silhouette(c, dist(data))[, "sil_width"])
+})
+
+oc <- which.max(sil)
+
+# Plot the silhouette scores for different numbers of clusters
+plot(2:10, sil, type = 'b', xlab = "Number of Clusters", ylab = "Silhouette",
+     main = "Silhouette Scores for Different Numbers of Clusters")
+```
+
+-   Interpretation
+
+Based on the Silhouette Scores, the optimal number of clusters are 2 since at this level, it reaches the highest silhouette score.
+
+-   Final Results for optimal clusters for Hierarchical clustering
+
+```{r}
+# Final clustering with the optimal number of clusters = 2
+clusters <- cutree(h, 2)
+
+table <- table(Cluster = clusters, Target = target)
+
+print(table)
+
+purity <- sum(apply(table, 1, max)) / sum(table)
+print(paste("Purity of clusters:", purity))
+
+```
+
+-   Summary
+
+The purity measure is about 0.9578, which is pretty high. This means that the groupings created by the Hierarchical clustering match up well with the Diabetes binary target variable.
+
+## Results and Conclusions
+
+The Silhouette method showed that both K-Means and hierarchical clustering suggest two clusters, which fits well because the DIABETES target variable has two categories. Surprisingly, all three clustering methods---K-Means, hierarchical, and DBSCAN---gave the same purity score of 0.9578. This could either point to a mistake in my code, which I'll check in Python, or it might just mean that the data forms clear groups. The binary nature of the target probably helps the algorithms perform well too.
+
+Between the methods, I'm leaning towards K-Means and hierarchical clustering. They're easier to grasp, especially their settings. DBSCAN's eps parameter is a bit more complex conceptualize.
+
+Going through this clustering has taught me not just about the methods but also about my data's structure. It seems all three methods are doing a good job in lining up with the actual categories in the data.
