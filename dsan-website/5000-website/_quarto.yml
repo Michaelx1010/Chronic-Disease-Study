@@ -32,11 +32,17 @@ website:
       - href: eda/eda.qmd
         text: Data Exploration
         
-      - href: clustering.qmd
-        text: clustering
+      - href: Clustering_R.qmd
+        text: Clustering in R
+
+      - href: Clustering_Python.qmd
+        text: Clustering in Python
         
-      - href: Dimensionality_reduction.qmd
-        text: Dimensionality reduction
+      - href: Dimensionality_reduction_R.qmd
+        text: Dimensionality reduction in R
+
+      - href: Dimensionality_reduction_python.qmd
+        text: Dimensionality reduction in Python
        
       - href: Decision_Trees.qmd
         text: Decision Tress

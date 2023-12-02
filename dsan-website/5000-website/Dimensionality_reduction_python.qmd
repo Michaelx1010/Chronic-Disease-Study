@@ -1,0 +1,163 @@
+---
+title: Dimensionality reduction
+format:
+  html:
+    code-fold: true
+    code-tools: true
+bibliography: references.bib
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+import seaborn as sns
+```
+
+## Introduction
+
+In the realm of data science and chronic diseases, one of the most pressing challenges is dealing with high-dimensional datasets that contain a multitude of variables and features. Dimensionality reduction techniques enabling us to distill valuable insights from complex data while mitigating computational burdens. In this coding section of our chronic diseases data science project, we employ dimensionality reduction methods that will not only streamline our analyses but also uncover hidden patterns, contribute to the development of more effective strategies for disease prevention and management. By utilizing the power of these techniques, we advance our understanding and ability to address these critical public health concerns. For this part, I will be using the Framingham heart study data set.
+
+## Data preparation
+
+```{python}
+# Load the Frammingham Heart Study data set
+data = pd.read_csv("data/frmgham2.csv")
+data.head()
+```
+
+### Missing data handelling and normalization
+
+```{python}
+# Check for missing data and calculate percentages
+missing_data = data.isnull().mean()
+
+# Drop columns with more than 50% missing data
+threshold = 0.5
+columns_to_drop = missing_data[missing_data > threshold].index
+data.drop(columns=columns_to_drop, inplace=True)
+data = data.iloc[:, 1:]
+
+# Remove rows with missing data as their percentages are low
+data.dropna(inplace=True)
+
+# Scale the data
+scaler = StandardScaler()
+data_scaled = scaler.fit_transform(data)
+data.head()
+```
+
+## PCA method
+
+### PCA results plots
+
+```{python}
+# Apply PCA
+pca = PCA(n_components=2)
+pca_result = pca.fit_transform(data_scaled)
+
+# Plot the PCA results
+sns.scatterplot(x=pca_result[:, 0], y=pca_result[:, 1])
+
+plt.title('PCA Results')
+plt.xlabel('First Principal Component')
+plt.ylabel('Second Principal Component')
+
+plt.figure()
+sns.barplot(x=[f"PC{i+1}" for i in range(pca.n_components_)], y=pca.explained_variance_ratio_)
+plt.title('Explained Variance by PCA Components')
+plt.ylabel('Explained Variance Ratio')
+
+plt.show()
+```
+
+### PCA variance table for the first two principal component
+
+```{python}
+# Create a DataFrame with the explained variance and cumulative variance
+explained_variance = pca.explained_variance_ratio_
+cumulative_variance = pca.explained_variance_ratio_.cumsum()
+
+pca_table = pd.DataFrame({'Principal Component': [f"PC{i+1}" for i in range(len(explained_variance))],
+                          'Explained Variance': explained_variance,
+                          'Cumulative Variance': cumulative_variance})
+
+print(pca_table)
+
+```
+
+### PCA Biplot
+
+```{python}
+# Get the loadings
+loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
+
+# Create a new matplotlib figure and axis
+fig, ax = plt.subplots(figsize=(10, 7))
+
+# Plot the loadings for each feature as arrows(I don't know how to draw biplots, used some assitance from Chatgpt)
+for i, (loading1, loading2) in enumerate(loadings):
+    ax.arrow(0, 0, loading1, loading2, head_width=0.05, head_length=0.1, length_includes_head=True, color='red')
+    plt.text(loading1 * 1.2, loading2 * 1.2, data.columns[i], color='black', ha='center', va='center')
+
+# Set plot labels and title
+ax.set_xlabel('First Principal Component')
+ax.set_ylabel('Second Principal Component')
+ax.set_title('PCA Biplot')
+ax.axhline(0, color='grey', lw=1)
+ax.axvline(0, color='grey', lw=1)
+ax.grid(True)
+
+# Show the plot
+plt.show()
+```
+
+**Interpretation**
+
+-   The PCA analysis results show that the first two principal components (PC1 and PC2) account for a significant portion of the variance in the dataset. PC1 explains `25.6414%` of the variance, and when combined with PC2 (`10.5013%`), they cumulatively explain 36.1428% of the variance.
+
+-   The scree plot and the table reflect a rapid drop in variance explained by each subsequent principal component after the first, which is typical in PCA. This suggests that PC1 captures the most significant pattern in the data, but there's still a meaningful amount of variation represented in PC2.
+
+-   In terms of data reduction, depending on the context and the acceptable level of information loss, it might be reasonable to consider reducing the dimensionality of the data to these two components for further analysis. However, since more than 60% of the variance remains unexplained, careful consideration should be given to the trade-off between dimensionality reduction and information retention.
+
+-   The PCA biplot reveals that variables such as `DIABP` (diastolic blood pressure), `AGE`, `HYPERTEN` (hypertension), `SYSBP` (systolic blood pressure), and `PREVHYP` (previous hypertension) have a pronounced influence on the first principal component. Conversely, variables like `CURSMOKE` (current smoker status), `CIGPDAY` (cigarettes per day), and `TIMEHYP` (time to hypertension development) exert a significant impact on the second principal component. This distinction provided by PCA enables us to ascertain the relative importance of different features, a task that becomes increasingly difficult as the dimensionality of the dataset grows. The PCA analysis effectively reduces the complexity of the data, allowing for a more manageable interpretation of the key features.
+
+## t-SNE Method
+
+```{python}
+# t-SNE analysis with different perplexity values
+perplexities = [5, 30, 50, 100]
+
+for perplexity in perplexities:
+    tsne = TSNE(n_components=2, perplexity=perplexity, random_state=42)
+    tsne_result = tsne.fit_transform(data_scaled)
+    tsne_df = pd.DataFrame(tsne_result, columns=['TSNE1', 'TSNE2'])
+
+    sns.scatterplot(data=tsne_df, x='TSNE1', y='TSNE2')
+    plt.title(f't-SNE with Perplexity {perplexity}')
+    plt.xlabel('Component 1')
+    plt.ylabel('Component 2')
+    plt.show()
+
+```
+
+**Interpretation**
+
+-   With `perplexity 5`, the plot shows numerous small clusters, indicating that the model is capturing more local structure in the data.
+
+-   `Perplexity 30` presents fewer, larger clusters, suggesting a more balanced view that incorporates broader data relationships.
+
+-   At `perplexity 50`, the clusters are less distinct but still separate, which might mean the model is starting to prioritize the global data structure over local nuances.
+
+-   Finally, `perplexity 100` leads to even more overlap between clusters, showing that the model is now focusing mainly on the broader patterns in the data.
+
+## Conclusions
+
+-   PCA and t-SNE are both powerful techniques for dimensionality reduction, each with distinct characteristics suitable for different types of data analysis.
+
+-   PCA is a linear technique that reduces dimensions by transforming the data into a new coordinate system where the greatest variances by any projection of the data come to lie on the first coordinates, known as principal components. It excels at preserving global structure and is computationally efficient, making it suitable for datasets where linear relationships are dominant.
+
+-   On the other hand, t-SNE is a non-linear technique, which excels at revealing local structures and clusters within the data. Unlike PCA, t-SNE can capture non-linear relationships by mapping the high-dimensional data to a lower-dimensional space in a way that preserves the data's local neighborhood structure. This makes t-SNE particularly useful for exploratory data analysis and for datasets where the underlying structure is complex and non-linear.

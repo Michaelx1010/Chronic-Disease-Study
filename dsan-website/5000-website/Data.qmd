@@ -387,9 +387,3 @@ Armed with these insights, the groundwork has been laid for a more detailed and 
 ### Tools and softwares
 
 For the core of this project, I will leverage R and the powerful tools provided by the tidyverse, specifically utilizing ggplot2 for creating insightful visualizations. Additionally, to enhance the depth and breadth of the project, I plan to incorporate Python into the analysis. Python libraries such as Seaborn,Plotly and Scikit-learn will be employed to further enrich the project's dimensions and offer diverse perspectives through their advanced plotting capabilities and machine learning model constructing. This multi-language approach aims to harness the strengths of both R and Python, ensuring a comprehensive and robust analysis.
-
-
-
-
-
-

@@ -1,0 +1,367 @@
+---
+title: "Clustering"
+format:
+  html:
+    code-fold: true
+    code-tools: true
+bibliography: references.bib
+---
+
+```{python}
+import warnings
+warnings.filterwarnings("ignore")
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
+from sklearn.metrics import silhouette_score
+from scipy.spatial.distance import cdist
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from scipy.optimize import linear_sum_assignment
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+```
+
+## Introduction
+
+In the field of chronic diseases research, understanding complex diseases like diabetes often involves discerning hidden patterns in data. This project utilizes clustering techniques, specifically K-Means, DBSCAN, and Hierarchical clustering, to analyze Diabetes from the Framingham Heart Study @RProjectFramingham. The use of these diverse methods allows for a comprehensive exploration of diabetes prediction and understanding. Each method, with its unique approach, helps in identifying distinct groups and complex relationships among various factors. By focusing on diabetes as the core subject, this analysis aims to decode how different risk factors, demographics, and lifestyle choices intersect, contributing to the disease's development and progression.
+
+## Theory
+
+### K Means Clustering
+
+-   K-means clustering divides data into k distinct groups. Initially, it randomly selects centroids from the data, which are like central points for each group. Data points are then grouped with the nearest centroid, forming initial clusters. After this, the average position of all the points in each cluster is calculated, creating new centroids. This process of assigning data points to the nearest centroid and recalculating the centroids is repeated until the clusters stabilize, usually meaning they don't change much between iterations.
+
+For evaluating how well the clustering worked, two common methods are the Elbow Method and Silhouette Analysis. The Elbow Method helps to choose a suitable number of clusters (k). It involves plotting the Sum of Squared Distances also known as inertia between data points and their respective cluster centroids against a range of k values. The elbow point, where the rate of decrease sharply changes, suggests a good number of clusters. On the other hand, Silhouette Analysis measures how similar a data point is to its own cluster compared to other clusters. It helps understand how well-separated the clusters are, with higher silhouette scores indicating better-defined clusters. @Dabbura2023
+
+### DBSAN
+
+-   DBSCAN looks at clustering from a density point of view. It groups points that are closely packed together, marking points that are too far from any cluster as outliers. The process starts by picking a point and finding all points within a certain distance, then a cluster is formed if there are enough pints. DBSCAN then checks the points around these new points, expanding the cluster if necessary. This method is particularly useful for data with irregular shapes. The key parameters are the maximum distance (also know as eps which is the radius of the neighborhood around each data point.) between points to be considered neighbors and the minimum number of points to form a dense region. Unlike K-Means, specifying the number of clusters is not required.
+
+-   For evaluating DBSCAN, using the Silhouette score is more appropriate than the Elbow method. The Elbow method is typically used for K Means Clustering where you need to determine the optimal number of clusters. In contrast, DBSCAN does not require specifying the number of clusters. The Silhouette score, which measures the quality of clusters by how well-separated they are, is suitable for evaluating the model performance of DBSCAN.
+
+### Hierarchical clustering
+
+-   Hierarchical clustering builds a tree of clusters by progressively linking together data points or existing clusters. Initially, each point is a cluster. The closest pairs of points (or clusters) are then merged into new clusters. This process is repeated, gradually forming larger clusters. The result can be visualized as a tree or dendrogram, showing the hierarchy of clustering, it is simlilar to the structure of a decision tree. An advantage of hierarchical clustering is that we don't need to decide the number of clusters in advance. We can choose the number of clusters by chopping the dendrogram at the desired level.
+
+-   For hierarchical clustering, the Silhouette score is a better method. While the Elbow method is useful for algorithms like K-means where you need to predetermine the number of clusters, hierarchical clustering provides a tree-like structure of data. The Silhouette score can help in determining the quality of the clusters formed at different levels. This method offers a clear insight into the distinctiveness of the clusters formed.
+
+## Methods
+
+### Data preparation
+
+```{python}
+# Load the Frammingham Heart Study data set
+data = pd.read_csv("data/frmgham2.csv")
+data.head()
+```
+
+### Missing data handelling and normalization
+
+```{python}
+# Check for missing data and calculate percentages
+missing_data = data.isnull().mean()
+
+# Drop columns with more than 50% missing data
+threshold = 0.5
+columns_to_drop = missing_data[missing_data > threshold].index
+data.drop(columns=columns_to_drop, inplace=True)
+data = data.iloc[:, 1:]
+
+# Remove rows with missing data as their percentages are low
+data.dropna(inplace=True)
+
+# Set target variables
+target = data.pop('DIABETES')
+
+# Scale the data
+scaler = StandardScaler()
+data_scaled = scaler.fit_transform(data)
+```
+
+### K-Means Clustering
+
+**Hyperparameter tuning function**
+
+```{python}
+import sklearn.cluster
+
+# THIS WILL ITERATE OVER ONE HYPER-PARAMETER (GRID SEARCH)
+# AND RETURN THE CLUSTER RESULT THAT OPTIMIZES THE SILHOUETTE SCORE
+def maximize_silhouette(X,algo="birch",nmax=20,i_plot=False):
+
+    # PARAM
+    i_print=False
+
+    #FORCE CONTIGUOUS
+    X=np.ascontiguousarray(X)
+
+    # LOOP OVER HYPER-PARAM
+    params=[]; sil_scores=[]
+    sil_max=-10
+    for param in range(2,nmax+1):
+        if(algo=="birch"):
+            model = sklearn.cluster.Birch(n_clusters=param).fit(X)
+            labels=model.predict(X)
+
+        if(algo=="ag"):
+            model = sklearn.cluster.AgglomerativeClustering(n_clusters=param).fit(X)
+            labels=model.labels_
+
+        if(algo=="dbscan"):
+            param=0.25*(param-1)
+            model = sklearn.cluster.DBSCAN(eps=param).fit(X)
+            labels=model.labels_
+
+        if(algo=="kmeans"):
+            model = sklearn.cluster.KMeans(n_clusters=param).fit(X)
+            labels=model.predict(X)
+
+        try:
+            sil_scores.append(sklearn.metrics.silhouette_score(X,labels))
+            params.append(param)
+        except:
+            continue
+
+        if(i_print): print(param,sil_scores[-1])
+
+        if(sil_scores[-1]>sil_max):
+             opt_param=param
+             sil_max=sil_scores[-1]
+             opt_labels=labels
+
+    print("OPTIMAL PARAMETER =",opt_param)
+
+    if(i_plot):
+        fig, ax = plt.subplots()
+        ax.plot(params, sil_scores, "-o")
+        ax.set(xlabel='Hyper-parameter', ylabel='Silhouette')
+        plt.show()
+
+    return opt_labels
+
+
+```
+
+**Utility Plot function**
+
+```{python}
+# UTILITY PLOTTING FUNCTION
+def plot(X,color_vector):
+    fig, ax = plt.subplots()
+    ax.scatter(X[:,0], X[:,1],c=color_vector, alpha=0.5) #, c=y
+    ax.set(xlabel='Feature-1 (x_1)', ylabel='Feature-2 (x_2)',
+    title='Cluster data')
+    ax.grid()
+    # fig.savefig("test.png")
+    plt.show()
+```
+
+**Elbow Method**
+
+```{python}
+# Elbow method for K Means
+inertia = []
+K = range(1, 11)
+for k in K:
+    kmeanModel = KMeans(n_clusters=k)
+    kmeanModel.fit(data_scaled)
+    inertia.append(kmeanModel.inertia_)
+
+# Plotting the elbow method
+sns.lineplot(x=K, y=inertia, marker="o")
+plt.title('Elbow Method For Optimal k')
+plt.xlabel('Number of clusters')
+plt.ylabel('Inertia')
+plt.show()
+```
+
+**Silhouette Method**
+
+```{python}
+opt_labels=maximize_silhouette(data_scaled,algo="kmeans",nmax=15, i_plot=True)
+plot(data_scaled,opt_labels)
+```
+
+-   As we can see from the both of the plots, `K=4` would be an optimal clusters value based on the elbow method, as it the inertia tend to get stabilized after `k=4`. From the Silhouette method, the resulting plot indicates that `k=2` is the optimal k since, it has the highest Silhouette value, indicating a well formed clustering structure. Overall, I pick `k=2` since at `k=2`, it is optimal for a binary target outcome.
+
+**Final Results for optimal K of K-Means**
+
+```{python}
+# Confusion Matrix Heatmap, used chatgpt as an assitance, this heat map works well
+def plot_confusion_matrix(cm, class_names):
+    df_cm = pd.DataFrame(cm, index=class_names, columns=class_names)
+    fig = plt.figure(figsize=(5,4))
+    try:
+        heatmap = sns.heatmap(df_cm, annot=True, fmt="d", cmap='Blues')
+    except ValueError:
+        raise ValueError("Confusion matrix values must be integers.")
+    
+    heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=14)
+    heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right', fontsize=14)
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    return fig
+
+
+# Final K-Means Clustering with Optimal k
+kmeans_final = KMeans(n_clusters=2)
+kmeans_clusters = kmeans_final.fit_predict(data_scaled)
+class_names = ['Negative', 'Positive']
+
+# Plot confusion matrix for K-Means
+cm_kmeans = confusion_matrix(target, kmeans_clusters)
+fig_kmeans = plot_confusion_matrix(cm_kmeans, class_names)
+plt.title('Confusion Matrix for K-Means')
+plt.show()
+
+print(cm_kmeans)
+
+precision = precision_score(target, kmeans_clusters)
+recall = recall_score(target, kmeans_clusters)
+f1 = f1_score(target, kmeans_clusters)
+accuracy = accuracy_score(target, kmeans_clusters)
+
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"F1-Score: {f1:.4f}")
+```
+
+-   **Accuracy (73.01%):** This suggests that the model correctly predicts whether a case is positive or negative about 73% of the time.
+
+-   **Precision (9.29%):** Precision is very low, indicating that when the model predicts a case as positive, it is correct only about 9% of the time.
+
+-   **Recall (61.73%):** The model has a moderately high recall, meaning it correctly identifies approximately 62% of all actual positive cases. However, due to the low precision, many of the positive predictions are not accurate.
+
+-   **F1-Score (16.15%):** The F1-score is quite low because it is the harmonic mean of precision and recall. The low precision adversely affects the F1-score even though the recall is not as low.
+
+## DBSCAN
+
+**Silhouette Method**
+
+```{python}
+opt_labels=maximize_silhouette(data_scaled,algo="dbscan",nmax=15, i_plot=True)
+plot(data_scaled,opt_labels)
+```
+
+-   The optimal parameter for DBSCAN method is `3.5`, at `eps = 3.5`, the Silhouette score is maximized.
+
+**Final Results for optimal eps of DBSCAN**
+
+```{python}
+optimal_eps = 3.5
+dbscan_final = DBSCAN(eps=optimal_eps)
+dbscan_clusters = dbscan_final.fit_predict(data_scaled)
+
+cluster_positive_ratio = []
+unique_clusters = set(dbscan_clusters) - {-1}  # Exclude noise if present
+
+# For this section of code, I used chatgpt to help me understand how to convert multi-dimensional data to binary predictions.
+
+for cluster in unique_clusters:
+    # Create a mask for the current cluster
+    cluster_mask = dbscan_clusters == cluster
+    # Calculate the ratio of positive instances in this cluster
+    positive_ratio = target[cluster_mask].mean()
+    cluster_positive_ratio.append((cluster, positive_ratio))
+
+# Sort clusters by positive ratio and get the cluster with the highest positive ratio
+optimal_cluster = sorted(cluster_positive_ratio, key=lambda x: x[1], reverse=True)[0][0]
+
+# Map the DBSCAN clusters to binary predictions
+binary_predictions = (dbscan_clusters == optimal_cluster).astype(int)
+
+# Compute metrics
+precision = precision_score(target, binary_predictions)
+recall = recall_score(target, binary_predictions)
+f1 = f1_score(target, binary_predictions)
+accuracy = accuracy_score(target, binary_predictions)
+
+# Confusion Matrix
+cm = confusion_matrix(target, binary_predictions)
+fig_kmeans = plot_confusion_matrix(cm, class_names)
+plt.title('Confusion Matrix for DBSCAN')
+plt.show()
+
+# Print metrics
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"F1-Score: {f1:.4f}")
+```
+
+-   **Accuracy (95.78%):** This is high, indicating that a large proportion of predictions match the actual labels. However, in the context of class imbalance, this metric can be misleading.
+
+-   **Precision (33.33%):** When the model predicts the positive class, it is correct about one-third of the time. This is relatively low and may be concerning if the positive class is of significant interest.
+
+-   **Recall (0.26%)**: This is very low, indicating that the model identifies only a tiny fraction of actual positive cases.
+
+-   **F1-Score (0.51%):** This is extremely low, suggesting that the balance between precision and recall is poor. The model is not effective in predicting positive cases.
+
+## Hierarchical clustering
+
+```{python}
+# Hierarchical Clustering
+Z = linkage(data_scaled, 'ward')
+
+# Plot dendrogram
+plt.figure(figsize=(10, 7))
+dendrogram(Z, truncate_mode='lastp', p=12, leaf_rotation=45., leaf_font_size=15., show_contracted=True)
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('Cluster size')
+plt.ylabel('Distance')
+plt.show()
+
+
+# AGGLOMERATIVE CLUSTERING
+opt_labels=maximize_silhouette(data_scaled,algo="ag",nmax=15, i_plot=True)
+plot(data_scaled,opt_labels)
+```
+
+-   The optimal parameter for DBSCAN method is `2`, at `parameter = 3.5`, the Silhouette score is maximized.
+
+**Final Results for optimal clusters of Hierarchical clustering**
+
+```{python}
+optimal_clusters = 2
+agglom_final = AgglomerativeClustering(n_clusters=optimal_clusters, affinity='euclidean', linkage='ward')
+hierarchical_clusters = agglom_final.fit_predict(data_scaled)
+
+# Plot confusion matrix for Hierarchical Clustering
+cm_hierarchical = confusion_matrix(target, hierarchical_clusters)
+fig_hierarchical = plot_confusion_matrix(cm_hierarchical, class_names)
+plt.title('Confusion Matrix for Hierarchical Clustering')
+plt.show()
+
+precision = precision_score(target, hierarchical_clusters)
+recall = recall_score(target, hierarchical_clusters)
+f1 = f1_score(target, hierarchical_clusters)
+accuracy = accuracy_score(target, hierarchical_clusters)
+
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"F1-Score: {f1:.4f}")
+```
+
+-   **Accuracy (41.62%):** This is relatively low, indicating that a significant number of predictions were incorrect.
+
+-   **Precision (1.50%):** This is very low, suggesting that when the model predicts the positive class, it is correct only 1.5% of the time.
+
+-   **Recall (19.90%):** This is also low, indicating that the model identified less than 20% of all actual positive cases.
+
+-   **F1-Score (2.79%):** This very low score indicates a poor balance between precision and recall, suggesting the model is not effective in predicting the positive class accurately.
+
+## Conclusions
+
+-   After evaluating the three clustering models---K-Means, DBSCAN, and Hierarchical Clustering---we can draw several conclusions about their performance and applicability to the dataset.
+
+-   K-Means showed moderate effectiveness, with a reasonable balance between classifying true negatives and positives. However, its precision was low, indicating a significant number of false positives. DBSCAN struggled with this dataset, as evidenced by low precision and recall, suggesting that its density-based clustering didn't align well with the data's structure or the binary nature of the target variable. Hierarchical Clustering underperformed, with low accuracy and a high rate of false positives, indicating difficulty in distinguishing between the classes.
+
+-   Each method has its merits, but none offered a robust solution for the given data. K-Means might be preferred for its relative simplicity and better performance in this context. The choice of model depends on the specific requirements and constraints of the task, including the acceptable trade-offs between false positives and negatives and the overall goal of the clustering (e.g., exploratory data analysis, dimensionality reduction, outlier detection).
+
+-   Future directions could involve more sophisticated techniques such as ensemble methods that combine multiple clustering models to improve overall performance. Moreover, fine-tuning the parameters of each model, exploring feature engineering, or trying alternative clustering approaches like spectral clustering could potentially yield better results. It's also crucial to incorporate domain knowledge, which can guide the choice and tuning of models to align with the underlying data patterns and the goals of the analysis.
