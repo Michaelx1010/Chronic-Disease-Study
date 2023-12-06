@@ -1,5 +1,5 @@
 ---
-title: Dimensionality reduction
+title: Dimensionality reduction in R
 format:
   html:
     code-fold: true
@@ -30,7 +30,7 @@ library(Rtsne)
 
 ## Introduction
 
-In the realm of data science and chronic diseases, one of the most pressing challenges is dealing with high-dimensional datasets that contain a multitude of variables and features. Dimensionality reduction techniques enabling us to distill valuable insights from complex data while mitigating computational burdens. In this coding section of our chronic diseases data science project, we employ dimensionality reduction methods that will not only streamline our analyses but also uncover hidden patterns, contribute to the development of more effective strategies for disease prevention and management. By utilizing the power of these techniques, we advance our understanding and ability to address these critical public health concerns. For this part, I will be using the Framingham heart study data set.
+In the world of data science and chronic diseases, one of the most challenging thing is dealing with high-dimensional datasets. Dimensionality reduction techniques enables us to extract valuable insights from complex, high dimensional data while reducing computational burdens. In this coding section of our chronic diseases data science project, we employ dimensionality reduction methods that will not only strengthen our analyses but also discern hidden patterns, contribute to the development of effective strategies for disease prevention. By utilizing the power of these techniques, we advance our understanding and ability to address these critical public health concerns. For this part, I will be using the Framingham heart study data set.
 
 ## Data preparation
 
@@ -128,7 +128,7 @@ p + theme(
 )
 ```
 
--   For the cardiovascular diseases study, while principal components beyond the tenth account for less than 3% of the variance individually, dropping these variables based solely on PCA results may not be optimal. The PCA is utilized here primarily as a methodological illustration, serving to highlight potential areas for dimensionality reduction. It is crucial to consider the clinical significance and relevance of each variable before making decisions about their exclusion, ensuring that essential data pertinent to cardiovascular research is retained.
+-   For the cardiovascular diseases study, while principal components beyond the tenth account for less than 3% of the variance individually, dropping these variables based solely on PCA results may not be a good idea. The PCA is utilized here primarily as a methodological illustration, serving to highlight potential areas for dimensionality reduction. It is crucial to consider the clinical significance and relevance of each variable before making decisions about their exclusion, ensuring that essential data pertinent to cardiovascular research is retained.
 
 -   The PCA biplot reveals that variables such as DIABP (diastolic blood pressure), AGE, HYPERTEN (hypertension), SYSBP (systolic blood pressure), and PREVHYP (previous hypertension) have a pronounced influence on the first principal component. Conversely, variables like CURSMOKE (current smoker status), CIGPDAY (cigarettes per day), and TIMEHYP (time to hypertension development) exert a significant impact on the second principal component. This distinction provided by PCA enables us to ascertain the relative importance of different features, a task that becomes increasingly difficult as the dimensionality of the dataset grows. The PCA analysis effectively reduces the complexity of the data, allowing for a more manageable interpretation of the key features.
 
@@ -171,10 +171,10 @@ ggplot(pca_data, aes(x = PC1, y = PC2)) +
   ggtitle("PCA Results")
 ```
 
--   By comparing the PCA and t-SNE results, the PCA plot reveals a pronounced linear dispersion along the primary principal component (PC1), with a less defined spread along the secondary principal component (PC2). This suggests that PC1 accounts for a substantial part of the data's variance. Unlike t-SNE, the PCA does not seem to capture distinct local clusters, indicating a limitation in highlighting non-linear relationships within the dataset. In contrast, t-SNE demonstrates its strength in revealing local clusters, suggesting that it can discern intricate non-linear patterns that PCA cannot detect.
+-   By comparing the PCA and t-SNE results, the PCA plot demonstartes a linear correlation along the primary principal component (PC1), with a less correlated spread along the secondary principal component (PC2). This suggests that PC1 accounts for a important part of the data's variance. Unlike t-SNE, the PCA does not seem to capture distinct local clusters, indicating a limitation in highlighting non-linear relationships within the dataset. In contrast, t-SNE demonstrates its strength in discerning local clusters, suggesting that it can discern intricate non-linear patterns that PCA cannot detect.
 
 ## Evaluation
 
-1.  PCA analysis is good at discerning linear relationships within high-dimensional data, offering a global view that highlights the directions of greatest variance. In contrast, t-SNE is good at detecting non-linear patterns, such as local and global clusters, which are evident in its visualizations that distinctly reveal data groupings.
+1.  PCA analysis is good at discerning linear relationships within high-dimensional data, offering a view in a global way. In contrast, t-SNE is good at detecting non-linear patterns, such as local and global clusters, which are evident in its visualizations that distinctly reveal data groupings.
 
-2.  A important observation during my coding is that the computational intensity of t-SNE, which often results in longer processing times compared to PCA. The choice between PCA and t-SNE for dimensionality reduction should be informed by the specific objectives of the analysis. PCA is typically preferred for its interpretability and efficiency, particularly when identifying the main axes of variation is crucial. t-SNE is more suited for exploratory data analysis where the focus is on identifying complex structures and patterns within the data. Understanding the context and desired outcomes is essential when selecting the appropriate method for a given dataset.
+2.  A important observation during my coding is that the computational intensity of t-SNE, which often results in longer processing times compared to PCA. The choice between PCA and t-SNE for dimensionality reduction should be considered by the specific objectives of the analysis. PCA is typically preferred for its efficiency. t-SNE is more suited for exploratory data analysis where the focus is on identifying complex structures and patterns within the data. 

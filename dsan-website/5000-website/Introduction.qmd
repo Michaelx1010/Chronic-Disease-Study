@@ -3,26 +3,42 @@ title: "Introduction"
 bibliography: references.bib
 ---
 
+![](images/cd1.png)
+
+## Introduction
+
+-  In this data science projects, We wil mainly focus on `diabetes`and `cardiovascular diseases (CVD)`, two prevalent chronic conditions that have a significant impact on public health. By performing `Exploratory Data Analysis (EDA)`, our objective is to detect patterns, classifications and correlations within the data that could find out factors and that could be contributing to these diseases.
+
+-  In this project, I will not only includes meticulous analytical methods but also advanced data visualization tools, in order to convert complex datasets into human readable insights.
+
+-  Our analysis will combine information from the `Chronic Disease Indicators (CDI)`, the `pioneering Framingham Heart Study`, and the `Pima Indian Diabetes dataset`. This multifaceted data collection approach ensures a comprehensive view of the chronic diseases modeling and analysis.
+
+- Machine learning algorithms play a vital role in this project. The `Naive Bayes classifier` will provide us with a probabilistic perspective in classification, while multiple `clustering` methods will aid in clustering and detecing distinct patient groups. Finally, `Decision Trees and Random Forest` algorithms will be employed for forecasting in both classification and regression analysis.
+
+- With this project, we move foward with the determination that data science have the capacity to not only inform but also transform the future of healthcare fileds by providing a deeper understanding of diabetes and cardiovascular diseases.
+
+
+## Literature review
+
 ### [Environmental/lifestyle factors in the pathogenesis and prevention of type 2 diabetes](https://bmcmedicine.biomedcentral.com/articles/10.1186/s12916-017-0901-x)
 
--   This article talks about different factors related to the causes and prevention of type 2 diabetes (T2D) based on epidemiological studies and intervention trials. This article dives deeply in different aspects of lifestyle factors including dietary habits, sleeping disorders, mental affects, body fat mass, etc. This topic is crucial for investigating potential lifestyle risk factors to develop T2D, that could not only improve public awareness but also give data collecting/analysis hypothesis for biostatistician.
+-   This article talks about different factors related to the causes and prevention of type 2 diabetes (T2D) based on epidemiological studies and intervention trials. This article discusses different parts of lifestyle factors including dietary habits, sleeping disorders, mental affects, body fat mass, etc. This topic is crucial for investigating potential lifestyle risk factors to develop T2D, that could not only improve public awareness but also give data collecting/analysis hypothesis for biostatistician.
 -   This article also address current data on personal, environmental, and lifestyle aspects are often limited. A host of environmental or lifestyle-dependent T2D risk factors have been described in prospective epidemiological studies, ranging from energy-dense food consumption to long-term exposure to high levels of fine dust. In these studies, the amount of personal, environmental or lifestyle aspects data that can or has been documented is limited, leaving room for confounding. @kolb2017environmentallifestyle
 -   This article will give me the initial hypothesis of possible factors that contribute do the developmnent of T2D. I will be able explore relevant datasets according to those hypothesis.
 
-### [Cancer Prevention: From 1727 to Milestones of the Past 100 Years](https://aacrjournals.org/cancerres/article/69/13/5269/549769/Cancer-Prevention-From-1727-to-Milestones-of-the)
+### [Cardiovascular health and potential cardiovascular risk factors in young athletes](https://www.frontiersin.org/articles/10.3389/fcvm.2023.1081675/full)
 
--   This article @lippman2009cancer talks about the rich history of the efforts on cancer prevention from from 1727 to milestones of the past 100 years, it disucsses the importance of historical research of cancer prevention and how it provides foundations for modern method including Molecular-Targeted Combinations, Population-Wide Approaches, Angiogenesis Targeting, New Imaging Approaches.
--   Cancer is obviously a huge challenge that affects millions of lives in this world. In order to better understand the cancer and its prevention methods, we can facilitate early detection that leads to more effective treatments. The information in ths article provide me with a better understanding of cancer and its historical prevention methods, gives me insight on hypothesis testing.
+-   This research paper "Cardiovascular health and potential cardiovascular risk factors in young athletes" investigates the cardiovascular risk in young athletes. Even with regular exercise, a high rate of potential cardiovascular risk factors was found. Elevated systolic blood pressure was observed in `12.6%` of participants, double the expected rate for the normal population. Structural vascular and cardiac changes, such as increased pulse wave velocity `(PWV)` and left ventricular mass `(LVM)`, were also observed. The study found a correlation between higher PWV and systolic blood pressure, which was closely related to elevated hemoglobin levels. This suggests a link between training-induced raised hemoglobin levels and altered vascular properties. Increased LVM was associated with lower resting heart rate, higher metabolic equivalent hours, sports with high dynamic components, and higher systolic BP. The study highlights the importance of regular medical examinations in young athletes to monitor for cardiovascular risk factors​​. @grabitz2023cardiovascular
 
-### Questions to answer:
+## Questions to answer:
 
-1.  What are the risk factors(including lifestyles, diets, enviromental factors, genetics, etc) that contributes to T2D? In other words, what factors have strong statitical correlation with the incidence of T2D.
-2.  What risk factors have less correlation with T2D?
-3.  Among the risk factors that have strong correlation with T2D, which one has the highest correlation?
-4.  Among the risk factors that have less correlation with T2D, which one has the least correlation?
-5.  What types of predictive has the best estimate an individual's risk of developing T2D?
-6.  Are there early signs that can be detected through regression analysis, allowing for the early diagnosis of T2D?
-7.  Can we develop accurate predictive models for blood glucose levels in T2D patients to help with insulin dosage and meal planning?
-8.  Can we use machine learning or time-series models to detect early signs of cancer?
-9.  What are the risk factors associated with specific types of cancer? How do genetic, lifestyle, environmental, and demographic factors contribute to cancer development?
-10. How can data visualization effectively communicate information of chronic diseases.
+1. What lifestyle, dietary, environmental, and genetic factors are statistically linked to the development of Type 2 Diabetes (T2D)?
+2. Is it feasible to utilize a Naive Bayes classifier for the classification or prediction of outcomes in chronic diseases?
+3. How do different clustering methods vary in terms of performance?
+4. Can dimensionality reduction techniques be effectively applied to datasets, and how do PCA (Principal Component Analysis) and t-SNE (t-Distributed Stochastic Neighbor Embedding) differ in their approach?
+5. Which predictive models are most accurate in assessing an individual's risk for Type 2 Diabetes and cardiovascular diseases?
+6. Can regression analysis identify early indicators that enable the premature diagnosis of Type 2 Diabetes?
+7. In what ways do the performances of decision tree models and random forest models differ?
+8. What insights and learnings can be gathered from this project on chronic diseases?
+9. What are the risk factors specific to different types of cardiovascular diseases, and in what ways do genetic, lifestyle, environmental, and demographic factors influence the development of cancer?
+10. How can data visualization be used effectively to convey information about chronic diseases?

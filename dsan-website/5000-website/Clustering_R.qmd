@@ -1,5 +1,5 @@
 ---
-title: "Clustering"
+title: "Clustering in R"
 format:
   html:
     code-fold: true
@@ -46,7 +46,7 @@ For evaluating how well the clustering worked, two common methods are the Elbow 
 
 ### DBSAN
 
--   DBSCAN looks at clustering from a density point of view. It groups points that are closely packed together, marking points that are too far from any cluster as outliers. The process starts by picking a point and finding all points within a certain distance, then a cluster is formed if there are enough pints. DBSCAN then checks the points around these new points, expanding the cluster if necessary. This method is particularly useful for data with irregular shapes. The key parameters are the maximum distance (also know as eps which is the radius of the neighborhood around each data point.) between points to be considered neighbors and the minimum number of points to form a dense region. Unlike K-Means, specifying the number of clusters is not required.
+-   DBSCAN looks at clustering from a density point of view. It groups points that are closely packed together, marking points that are too far from any cluster as outliers. The process starts by picking a point and finding all points within a certain distance, then a cluster is formed if there are enough pints. DBSCAN then checks the points around these new points, expanding the cluster if it is necessary. This method is particularly useful for data with irregular shapes. The key parameters are the maximum distance (also know as eps which is the radius of the neighborhood around each data point.) between points to be considered neighbors and the minimum number of points to form a dense region. Unlike K-Means, specifying the number of clusters is not required.
 
 -   For evaluating DBSCAN, using the Silhouette score is more appropriate than the Elbow method. The Elbow method is typically used for K Means Clustering where you need to determine the optimal number of clusters. In contrast, DBSCAN does not require specifying the number of clusters. The Silhouette score, which measures the quality of clusters by how well-separated they are, is suitable for evaluating the model performance of DBSCAN.
 

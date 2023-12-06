@@ -1,5 +1,5 @@
 ---
-title: Dimensionality reduction
+title: Dimensionality reduction in Python
 format:
   html:
     code-fold: true
@@ -19,7 +19,7 @@ import seaborn as sns
 
 ## Introduction
 
-In the realm of data science and chronic diseases, one of the most pressing challenges is dealing with high-dimensional datasets that contain a multitude of variables and features. Dimensionality reduction techniques enabling us to distill valuable insights from complex data while mitigating computational burdens. In this coding section of our chronic diseases data science project, we employ dimensionality reduction methods that will not only streamline our analyses but also uncover hidden patterns, contribute to the development of more effective strategies for disease prevention and management. By utilizing the power of these techniques, we advance our understanding and ability to address these critical public health concerns. For this part, I will be using the Framingham heart study data set.
+In the world of data science and chronic diseases, one of the most challenging thing is dealing with high-dimensional datasets. Dimensionality reduction techniques enables us to extract valuable insights from complex, high dimensional data while reducing computational burdens. In this coding section of our chronic diseases data science project, we employ dimensionality reduction methods that will not only strengthen our analyses but also discern hidden patterns, contribute to the development of effective strategies for disease prevention. By utilizing the power of these techniques, we advance our understanding and ability to address these critical public health concerns. For this part, I will be using the Framingham heart study data set.
 
 ## Data preparation
 
@@ -117,27 +117,27 @@ plt.show()
 
 **Interpretation**
 
--   The PCA analysis results show that the first two principal components (PC1 and PC2) account for a significant portion of the variance in the dataset. PC1 explains `25.6414%` of the variance, and when combined with PC2 (`10.5013%`), they cumulatively explain 36.1428% of the variance.
+-   The PCA analysis results show that the first two principal components (PC1 and PC2) plays a significant portion of the variance in the dataset. PC1 explains `25.6414%` of the variance, and when combined with PC2 (`10.5013%`), they contain 36.1428% of the variance in total.
 
--   The scree plot and the table reflect a rapid drop in variance explained by each subsequent principal component after the first, which is typical in PCA. This suggests that PC1 captures the most significant pattern in the data, but there's still a meaningful amount of variation represented in PC2.
+-   The scree plot and the table reflect a rapid drop in variance explained by each subsequent principal component after the first, which is typical in PCA analysis. This suggests that PC1 captures the most significant variance in the data, but there's still a meaningful amount of variation represented in PC2.
 
--   In terms of data reduction, depending on the context and the acceptable level of information loss, it might be reasonable to consider reducing the dimensionality of the data to these two components for further analysis. However, since more than 60% of the variance remains unexplained, careful consideration should be given to the trade-off between dimensionality reduction and information retention.
+-   Depending on the specific context of data science analysis, considering reducing the dimensionality of the data to these two components for further analysis might be beneficial.
 
--   The PCA biplot reveals that variables such as `DIABP` (diastolic blood pressure), `AGE`, `HYPERTEN` (hypertension), `SYSBP` (systolic blood pressure), and `PREVHYP` (previous hypertension) have a pronounced influence on the first principal component. Conversely, variables like `CURSMOKE` (current smoker status), `CIGPDAY` (cigarettes per day), and `TIMEHYP` (time to hypertension development) exert a significant impact on the second principal component. This distinction provided by PCA enables us to ascertain the relative importance of different features, a task that becomes increasingly difficult as the dimensionality of the dataset grows. The PCA analysis effectively reduces the complexity of the data, allowing for a more manageable interpretation of the key features.
+-   The PCA biplot demonstartes that variables such as `DIABP` (diastolic blood pressure), `AGE`, `HYPERTEN` (hypertension), `SYSBP` (systolic blood pressure), and `PREVHYP` (previous hypertension) have a pronounced influence on the first principal component. Conversely, variables like `CURSMOKE` (current smoker status), `CIGPDAY` (cigarettes per day), and `TIMEHYP` (time to hypertension development) has a significant impact on the second principal component. This distinction provided by PCA enables optimal feature engineering. The PCA analysis effectively reduces the complexity of the data, allowing for a more manageable interpretation of the key features.
 
 ## t-SNE Method
 
 ```{python}
 # t-SNE analysis with different perplexity values
-perplexities = [5, 30, 50, 100]
+ps = [5, 30, 50, 100]
 
-for perplexity in perplexities:
-    tsne = TSNE(n_components=2, perplexity=perplexity, random_state=42)
+for p in ps:
+    tsne = TSNE(n_components=2, perplexity=p, random_state=42)
     tsne_result = tsne.fit_transform(data_scaled)
     tsne_df = pd.DataFrame(tsne_result, columns=['TSNE1', 'TSNE2'])
 
     sns.scatterplot(data=tsne_df, x='TSNE1', y='TSNE2')
-    plt.title(f't-SNE with Perplexity {perplexity}')
+    plt.title(f't-SNE with Perplexity {p}')
     plt.xlabel('Component 1')
     plt.ylabel('Component 2')
     plt.show()
@@ -158,6 +158,6 @@ for perplexity in perplexities:
 
 -   PCA and t-SNE are both powerful techniques for dimensionality reduction, each with distinct characteristics suitable for different types of data analysis.
 
--   PCA is a linear technique that reduces dimensions by transforming the data into a new coordinate system where the greatest variances by any projection of the data come to lie on the first coordinates, known as principal components. It excels at preserving global structure and is computationally efficient, making it suitable for datasets where linear relationships are dominant.
+-   PCA is a linear technique that reduces dimensions by transforming the data into a new coordinate system where the greatest variances by any projection of the data come to lie on the first coordinates, known as principal components. It is proficient at preserving global structure and is computationally efficient, making it suitable for datasets where linear relationships are dominant.
 
--   On the other hand, t-SNE is a non-linear technique, which excels at revealing local structures and clusters within the data. Unlike PCA, t-SNE can capture non-linear relationships by mapping the high-dimensional data to a lower-dimensional space in a way that preserves the data's local neighborhood structure. This makes t-SNE particularly useful for exploratory data analysis and for datasets where the underlying structure is complex and non-linear.
+-   On the other hand, t-SNE is a non-linear technique, which is proficient at finding out local structures and clusters within the data. Unlike PCA, t-SNE can capture non-linear relationships by mapping the high-dimensional data to a lower-dimensional space in a way that preserves the data's local neighborhood structure. This makes t-SNE particularly useful for exploratory data analysis and for datasets where the underlying structure is non-linear.

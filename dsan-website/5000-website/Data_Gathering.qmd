@@ -8,55 +8,52 @@ format:
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
+library(DT)
 ```
 
-### Notes
+## Notes
+For data gethering, accessing health data especially in chronic disease data is quite hard by using APIs, the only API data I will be using is the Pima diabetes data generated from R. Also, it is challenging to find `Text data` for my topic, so all the data in the project will be record data.
 
-For HW2, accessing health data especially in chronic disease data like diabetes and cancer is quite hard by using APIs, so I won't be using either Python or R APIs to extract data, it is just not worth the time.
+## Data Sources from online
 
 ### [U.S. Chronic Disease Indicators (CDI)](https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi)
 
 CDC's Division of Population Health provides cross-cutting set of 124 indicators that were developed by consensus and that allows states and territories and large metropolitan areas to uniformly define, collect, and report chronic disease data that are important to public health practice and available for states, territories and large metropolitan areas. In addition to providing access to state-specific indicator data, the CDI web site serves as a gateway to additional information and data resources.
 
+![](images/cdc.png)
+
 ```{r, message=FALSE, warning=FALSE}
 us_chronic <- read_csv("data/U.S._Chronic_Disease_Indicators__CDI_.csv")
-head(us_chronic)
+datatable(head(us_chronic))
 ```
 
-### [Alzheimer's Disease and Healthy Aging Data](https://catalog.data.gov/dataset/alzheimers-disease-and-healthy-aging-data)
 
-The Alzheimer's Disease and Healthy Aging Data set is a collection of data gathered from the Behavioral Risk Factor Surveillance System (BRFSS) from 2015 to 2021. Published by the Centers for Disease Control and Prevention (CDC), this dataset aims at providing insights into the health and well-being of older adults. The dataset covers various topics including cognitive health, alcohol consumption, falls, caregiver information, dietary habits, obesity, overall health, screenings, smoking, and vaccines.
-
-```{r, warning=FALSE, message=FALSE}
-alzheimer <- read.csv("data/Alzheimer_s_Disease_and_Healthy_Aging_Data.csv")
-head(alzheimer)
-```
-
-### [Behavioral Risk Factor Data: Tobacco Use (2011 to present)](https://catalog.data.gov/dataset/behavioral-risk-factor-data-tobacco-use-2011-to-present)
-
-2011-2019. Centers for Disease Control and Prevention (CDC). State Tobacco Activities Tracking and Evaluation (STATE) System. BRFSS Survey Data. The BRFSS is a continuous, state-based surveillance system that collects information about modifiable risk factors for chronic diseases and other leading causes of death. The data for the STATE System were extracted from the annual BRFSS surveys from participating states. Tobacco topics included are cigarette and e-cigarette use prevalence by demographics, cigarette and e-cigarette use frequency, and quit attempts. NOTE: these data are not to be compared with BRFSS data collected 2010 and prior, as the methodologies were changed. Please refer to the FAQs / Methodology sections for more details.
-
-```{r, warning=FALSE, message=FALSE}
-smoke <- read.csv("data/Behavioral_Risk_Factor_Data.csv")
-head(smoke)
-```
-
-### [Specific Chronic Conditions)](https://catalog.data.gov/dataset/specific-chronic-conditions-0f448)
-
-The Select Chronic Conditions dataset provides information on 21 selected chronic conditions among Original Medicare beneficiaries. The dataset contains prevalence, use and spending organized by geography and distinct chronic conditions listed below.
-
-• Alcohol Abuse Drug Abuse/ Substance Abuse • Alzheimer's Disease and Related Dementia • Arthritis (Osteoarthritis and Rheumatoid) • Asthma • Atrial Fibrillation • Autism Spectrum Disorders • Cancer (Breast, Colorectal, Lung, and Prostate) • Chronic Kidney Disease • Chronic Obstructive Pulmonary Disease • Depression • Diabetes • Drug Abuse/ Substance Abuse • Heart Failure • Hepatitis (Chronic Viral B & C) • HIV/AIDS • Hyperlipidemia (High cholesterol) • Hypertension (High blood pressure) • Ischemic Heart Disease • Osteoporosis • Schizophrenia and Other Psychotic Disorders • Stroke
-
-```{r, warning=FALSE, message=FALSE}
-chronic <- read.csv("data/CC_R20_P08_v10_D18_WWDSE_Cond (1).csv")
-head(chronic)
-```
 
 ### [Framingham Heart Study Longitudinal Data](https://www.framinghamheartstudy.org/fhs-for-researchers/data-available-overview/)
 
 The Framingham Heart Study is a long term prospective study of the etiology of cardiovascular disease among a population of free living subjects in the community of Framingham, Massachusetts. The Framingham Heart Study was a landmark study in epidemiology in that it was the first prospective study of cardiovascular disease and identified the concept of risk factors and their joint effects. The study began in 1948 and 5,209 subjects were initially enrolled in the study. Participants have been examined biennially since the inception of the study and all subjects are continuously followed through regular surveillance for cardiovascular outcomes. Clinic examination data has included cardiovascular disease risk factors and markers of disease such as blood pressure, blood chemistry, lung function, smoking history, health behaviors, ECG tracings, Echocardiography, and medication use. Through regular surveillance of area hospitals, participant contact, and death certificates, the Framingham Heart Study reviews and adjudicates events for the occurrence of Angina Pectoris, Myocardial Infarction, Heart Failure, and Cerebrovascular disease.
 
+![](images/fh.jpg)
+
 ```{r, warning=FALSE, message=FALSE}
 heart_study <- read_csv("data/frmgham2.csv")
-head(heart_study)
+datatable(head(heart_study))
 ```
+
+
+## Data generated from R API
+
+
+### [PimaIndiansDiabetes](https://search.r-project.org/CRAN/refmans/mlbench/html/PimaIndiansDiabetes.html)
+
+
+The dataset contains test results obtained from a population of women, all of whom were at least 21 years old, of Pima Indian heritage, These data were originally collected by the US National Institute of Diabetes and Digestive and Kidney Diseases and can be accessed directly from the `PimaIndiansDiabetes2` dataset. The dataset consists of 768 observations encompassing nine variables. These variables include the number of times of pregency, their plasma glucose concentration , diastolic blood pressure measured in millimeters of mercury (mm Hg), triceps skin fold thickness in millimeters (mm), 2-hour serum insulin levels expressed in micro international units per milliliter (mu U/ml), body mass index (BMI) calculated as weight in kilograms divided by the square of height in meters, the diabetes pedigree function, the age of the individuals in years, and a factor variable indicating the diabetes test result as either negative or positive. 
+
+```{r}
+library(mlbench)
+data(PimaIndiansDiabetes)
+data <- PimaIndiansDiabetes
+datatable(data)
+```
+
+

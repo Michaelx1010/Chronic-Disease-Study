@@ -19,16 +19,25 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
 ```
 
-## Methods
+## Introductions
 
 ### Decision Trees:
 
-A Decision Tree is a flowchart-like tree structure where each internal node represents a feature(or attribute), each branch represents a decision rule, and each leaf node represents the outcome. The topmost node in a tree is known as the root node. It learns to partition on the basis of the attribute value. It partitions the tree in a recursive manner called recursive partitioning. This flowchart-like structure helps in decision making. It's visualization like a tree structure.
+A Decision Tree is a tree-like structure where each internal node represents a feature, each branch represents a decision rule, and each leaf node represents the tree outcome. The top node in a tree is known as the root node. It learns to partition on the basis of the attribute value. It partitions the tree in a recursive manner called recursive partitioning. This tree-like structure helps in decision making. 
 
 ### Random Forest:
 
-Random Forest is an ensemble learning method, where multiple decision trees are combined to increase the overall performance. While a single decision tree might be prone to overfitting, Random Forest averages multiple trees to reduce overfitting and improve prediction accuracy. Each tree in a Random Forest is built from a sample drawn with replacement (i.e., a bootstrap sample) from the training set. Furthermore, when splitting each node during the construction of a tree, the best split is found either from all input features or a random subset of size max_features.
+Random Forest is an ensemble learning method, where multiple decision trees are combined to increase the overall performance. While a single decision tree might lead to overfitting, Random Forest averages multiple trees to reduce overfitting and improve prediction accuracy. Furthermore, when splitting each node during the construction of a tree, the best split is found either from all input features or a random subset of size max_features.
 
+
+## Methods
+
+For this part of the analysis, I will be applying both `classification` and `regression` for decision tree analysis, I will be applying the classification methods to binary data Cardiovascular dieases `(CVD)` and regressino methods to continuous numeric data `GLUCOSE`.
+
+
+::: {.panel-tabset}
+
+# Classification
 
 ## Data and Class Distribution
 
@@ -37,6 +46,7 @@ For this part of the analysis, I will be using the Framingham Heart Study datase
 ```{python}
 # Load the Frammingham Heart Study data set
 data = pd.read_csv("data/frmgham2.csv")
+data.head()
 
 # Split target variables and predictor variables
 y = data['CVD']
@@ -200,7 +210,7 @@ print(hyper_param[i],train_error[i],test_error[i])
 ```
 
 
-- The convergence plot clearly demonstrates that as the `max_depth` hyperparameter increases, both training and test errors exhibit a pattern of stabilization. This observation corroborates the assumptions made in the previous section. Specifically, it indicates that beyond a certain depth, the decision tree model ceases to substantially improve its fit to the training data, and the test error also plateaus. This phenomenon suggests that increasing the `max_depth` further may lead to overfitting, as the model becomes overly complex and starts fitting noise in the training data, while failing to improve its generalization to unseen test data. Hence, the plot supports the notion that there exists an optimal `max_depth` value that strikes a balance between model complexity and performance on the test dataset.
+- The convergence plot clearly demonstrates that as the `max_depth` hyperparameter increases, both training and test errors demonstrate a pattern of stabilization. This observation alligns with the assumptions made in the previous section. Specifically, it indicates that beyond a certain depth, the decision tree model ceases to substantially improve its fit to the training data, and we could infer that increasing the `max_depth` further may lead to overfitting, as the model becomes overly complex and starts fitting noise in the training data, while failing to improve its generalization. Hence, the plot supports the notion that there exists an optimal `max_depth` value that strikes a balance between model complexity and performance on the test dataset.
 
 
 
@@ -244,9 +254,9 @@ for i in range(2,100):
 
 - The `min_samples_split` parameter controls the minimum number of samples required to split an internal node during the construction of the decision tree.
 
-- As `min_samples_split` increases from 2 to 10, both the training and test errors generally decrease. This suggests that when internal nodes require a larger number of samples to split.
+- As `min_samples_split` increases from 10 to 20, both the training and test errors generally decrease. This suggests that when internal nodes require a larger number of samples to split.
 
-- Beyond `min_samples_split` = 10, the training error remains low or slightly increases, indicating that the model still fits the training data well, however, the erros for test data follows a clear wave-like pattern.
+- Beyond `min_samples_split` = 20, the training error remains low or slightly increases, indicating that the model still fits the training data well, however, the erros for test data follows a clear wave-like pattern.
 
 - Overall, the results suggest that a `min_samples_split` value around 30 provides a good balance between model complexity and generalization.
 
@@ -269,7 +279,7 @@ In practical terms, this indicates that we should seek a `min_samples_split` val
 
 ```{python}
 # INITIALIZE MODEL 
-model = DecisionTreeRegressor(max_depth=10)
+model = DecisionTreeClassifier(max_depth=10, min_samples_split=30)
 model.fit(x_train,y_train)                     # TRAIN MODEL 
 
 
@@ -324,10 +334,267 @@ plot_tree(model)
 
 ## Conclusions(The final reaults are discussed with each section)
 
-- This exploration into the data gave us insights into heart disease risks through a Decision Tree model, which performed quite well when looking back at the health data we trained it on. However, when faced with new, unseen data, the model's predictions were less consistent. This suggests that while our model has learned well from past data, it needs to be better tuned to handle new information effectively.
+- The decision tree with classification analysis gave us insights into heart disease risks, which performed quite well when looking back at the data we trained it on. However, when faced with new, unseen data, the model's predictions were inconsistent. This suggests that while our model has learned well from past data, it needs to be better tuned to handle new information effectively.
 
-- To improve, we aim to adjust our model's complexity. It's a delicate balance, when the model is too simple, and we miss important patterns, when the model is too complex, and we face the risk if overfitting instead of generalization. The goal is to build a model that not only learns from the past but is also robust enough to make reliable predictions for the future.
-
-
+- To improve, we aim to adjust our model's complexity. When the model is too simple, and we miss important patterns, when the model is too complex, and we face the risk if overfitting instead of generalization. The goal is to build a model that not only learns from the past but is also ptovide usefull insight for generalization.
 
 
+
+
+# Regression
+
+## Data understanding
+
+For this part of the analysis, I will be using the Framingham Heart Study dataset@RProjectFramingham for both Decision Tree and Random Forest Analysis, the target variable for this analysis would be `GLUCOSE`, in mmol/L (millimoles per liter).
+
+```{python}
+from sklearn.metrics import mean_absolute_percentage_error
+from sklearn.metrics import mean_absolute_error
+from sklearn.tree import DecisionTreeRegressor
+
+# Load the Frammingham Heart Study data set
+data = pd.read_csv("data/frmgham2.csv")
+print(data.head())
+data.dropna(inplace=True)
+
+# Split target variables and predictor variables
+y = data['GLUCOSE']
+x = data.drop('GLUCOSE', axis=1)
+x = x.iloc[:, 1:]
+x = x.values
+y = y.values
+
+# Normalize 
+x=0.1+(x-np.min(x,axis=0))/(np.max(x,axis=0)-np.min(x,axis=0))
+y=0.1+(y-np.min(y,axis=0))/(np.max(y,axis=0)-np.min(y,axis=0))
+```
+
+## EDA
+
+```{python}
+data_eda = data.iloc[:, 1:]
+print(data_eda.describe())
+```
+
+### Correlation Matrix Heatmap
+```{python}
+corr = data.corr()
+sns.set_theme(style="white")
+f, ax = plt.subplots(figsize=(11, 9))  # Set up the matplotlib figure
+cmap = sns.diverging_palette(230, 20, as_cmap=True)     # Generate a custom diverging colormap
+# Draw the heatmap with the mask and correct aspect ratio
+sns.heatmap(corr,  cmap=cmap, vmin=-1, vmax=1, center=0,
+        square=True, linewidths=.5, cbar_kws={"shrink": .5})
+plt.show();
+```
+
+
+
+## Model Tuning
+
+### Partion data to train/test split
+
+```{python}
+from sklearn.model_selection import train_test_split
+test_ratio=0.2
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_ratio, random_state=0)
+y_train=y_train.flatten()
+y_test=y_test.flatten()
+
+print("x_train.shape        :",x_train.shape)
+print("y_train.shape        :",y_train.shape)
+
+print("X_test.shape     :",x_test.shape)
+print("y_test.shape     :",y_test.shape)
+```
+
+
+### Hyper-Parameter tuning for Decision Tree Classification ((max_depth))
+```{python}
+from sklearn.metrics import mean_absolute_percentage_error
+from sklearn.metrics import mean_absolute_error
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier
+
+
+# HYPER PARAMETER SEARCH FOR OPTIMAL NUMBER OF NEIGHBORS 
+hyper_param=[]
+train_error=[]
+test_error=[]
+
+# LOOP OVER HYPER-PARAM
+for i in range(1,40):
+    # INITIALIZE MODEL 
+    model = DecisionTreeRegressor(max_depth=i)
+
+    # TRAIN MODEL 
+    model.fit(x_train,y_train)
+
+    # OUTPUT PREDICTIONS FOR TRAINING AND TEST SET 
+    yp_train = model.predict(x_train)
+    yp_test = model.predict(x_test)
+
+    # shift=1+np.min(y_train) #add shift to remove division by zero 
+    err1=mean_absolute_error(y_train, yp_train) 
+    err2=mean_absolute_error(y_test, yp_test) 
+    
+    # err1=100.0*np.mean(np.absolute((yp_train-y_train)/y_train))
+    # err2=100.0*np.mean(np.absolute((yp_test-y_test)/y_test))
+
+    hyper_param.append(i)
+    train_error.append(err1)
+    test_error.append(err2)
+
+    if(i==1 or i%10==0):
+        print("hyperparam =",i)
+        print(" train error:",err1)
+        print(" test error:" ,err2)
+
+```
+
+- For `max_depth` = 1, both the training and test errors are relatively low, with values around 0.03. This suggests that the decision tree is fitting the data well.
+
+- As the `max_depth` increase to 10 and beyond, the training erros starts to drop, however, the test error starts to go up.
+
+- Interestingly, as `max_depth` furthur increase to 20 and 30, the training error remains very low (close to 0), but the test error starts to increase slightly. This is a sign of overfitting. The model is capturing the data too well, we don't want this to happen for generalization purposes.
+
+- Overall, the results show that a `max_depth` of around 1 to 10 appears to be a good choice because it achieves low test error without overfitting the training data. 
+
+- **Convergence plot**
+
+```{python}
+plt.plot(hyper_param,train_error ,linewidth=2, color='k')
+plt.plot(hyper_param,test_error ,linewidth=2, color='b')
+
+plt.xlabel("Depth of tree (max depth)")
+plt.ylabel("Training (black) and test (blue) MAE (error)")
+
+i=1
+print(hyper_param[i],train_error[i],test_error[i])
+
+```
+
+
+- The convergence plot clearly demonstrates that as the `max_depth` hyperparameter increases, The point at which the lines start to diverge significantly is critical; it marks the transition from underfitting to the optimal complexity and then to overfitting. According to the plot a `max_depth` of 0 to 5 is optimal for a balance between training error and testing error.
+
+
+
+### Hyper-Parameter tuning for Decision Tree Regression (min_samples_splitint)
+
+```{python}
+# HYPER PARAMETER SEARCH FOR OPTIMAL NUMBER OF NEIGHBORS 
+hyper_param=[]
+train_error=[]
+test_error=[]
+
+# LOOP OVER HYPER-PARAM
+for i in range(2,100):
+    # INITIALIZE MODEL 
+    model = DecisionTreeRegressor(min_samples_split=i)
+
+    # TRAIN MODEL 
+    model.fit(x_train,y_train)
+
+    # OUTPUT PREDICTIONS FOR TRAINING AND TEST SET 
+    yp_train = model.predict(x_train)
+    yp_test = model.predict(x_test)
+
+    # shift=1+np.min(y_train) #add shift to remove division by zero 
+    err1=mean_absolute_error(y_train, yp_train) 
+    err2=mean_absolute_error(y_test, yp_test) 
+    
+    # err1=100.0*np.mean(np.absolute((yp_train-y_train)/y_train))
+    # err2=100.0*np.mean(np.absolute((yp_test-y_test)/y_test))
+
+    hyper_param.append(i)
+    train_error.append(err1)
+    test_error.append(err2)
+
+    if(i%10==0):
+        print("hyperparam =",i)
+        print(" train error:",err1)
+        print(" test error:" ,err2)
+
+```
+
+- The `min_samples_split` parameter controls the minimum number of samples required to split an internal node during the construction of the decision tree.
+
+- As `min_samples_split` increases from 10 to 20, both the training and test errors generally decrease. This suggests that when internal nodes require a larger number of samples to split.
+
+- Beyond `min_samples_split` = 20, the training error remains low, indicating that the model still fits the training data well, the test error drops at the same time.
+
+**Convergence Plot**
+
+```{python}
+plt.plot(hyper_param,train_error ,linewidth=2, color='k')
+plt.plot(hyper_param,test_error ,linewidth=2, color='b')
+
+plt.xlabel("Minimum number of points in split (min_samples_split)")
+plt.ylabel("Training (black) and test (blue) MAE (error)")
+```
+
+
+
+The convergence plot demonstrates that test error and train error converge to a point, roughly `min_samples_spliy = 50`.
+
+### Re-train with optimal parameters
+
+```{python}
+# INITIALIZE MODEL 
+model = DecisionTreeRegressor(max_depth=1,min_samples_split=50)
+model.fit(x_train,y_train)                     # TRAIN MODEL 
+
+
+# OUTPUT PREDICTIONS FOR TRAINING AND TEST SET 
+yp_train = model.predict(x_train)
+yp_test = model.predict(x_test)
+
+err1=mean_absolute_error(y_train, yp_train) 
+err2=mean_absolute_error(y_test, yp_test) 
+    
+print(" train error:",err1)
+print(" test error:" ,err2)
+```
+
+
+### Parity Plot
+
+- Plotting y_pred vs y_data lets you see how good the fit is
+
+- The closer to the line y=x the better the fit (ypred=ydata –> prefect fit)
+
+```{python}
+plt.plot(y_train,yp_train ,"o", color='k')
+plt.plot(y_test,yp_test ,"o", color='b')
+plt.plot(y_train,y_train ,"-", color='r')
+
+plt.xlabel("y_data")
+plt.ylabel("y_pred (blue=test)(black=Train)")
+
+```
+
+
+### Plot Tree
+
+```{python}
+from sklearn import tree
+def plot_tree(model):
+    fig = plt.figure(figsize=(25,20))
+    _ = tree.plot_tree(model, 
+                    filled=True)
+    plt.show()
+
+plot_tree(model)
+```
+
+
+
+## Conclusions(The final reaults are discussed with each section)
+
+- The decision tree with regression analysis gave us insights into heart disease risks, which performed quite well when looking back at the data we trained it on. However, when faced with new, unseen data, the model's predictions were inconsistent. This suggests that while our model has learned well from past data, it needs to be better tuned to handle new information effectively.
+
+- To improve, we aim to adjust our model's complexity. When the model is too simple, and we miss important patterns, when the model is too complex, and we face the risk if overfitting instead of generalization. The goal is to build a model that not only learns from the past but is also ptovide usefull insight for generalization.
+
+
+
+:::

@@ -1,5 +1,5 @@
 ---
-title: "Clustering"
+title: "Clustering in Python"
 format:
   html:
     code-fold: true
@@ -358,10 +358,10 @@ print(f"F1-Score: {f1:.4f}")
 
 ## Conclusions
 
--   After evaluating the three clustering models---K-Means, DBSCAN, and Hierarchical Clustering---we can draw several conclusions about their performance and applicability to the dataset.
+-   After evaluating the three clustering models---`K-Means`, `DBSCAN`, and `Hierarchical Clustering`---we can infer several conclusions about their performance to the dataset.
 
--   K-Means showed moderate effectiveness, with a reasonable balance between classifying true negatives and positives. However, its precision was low, indicating a significant number of false positives. DBSCAN struggled with this dataset, as evidenced by low precision and recall, suggesting that its density-based clustering didn't align well with the data's structure or the binary nature of the target variable. Hierarchical Clustering underperformed, with low accuracy and a high rate of false positives, indicating difficulty in distinguishing between the classes.
+-   K-Means showed moderate effectiveness, with a balance between true negatives and positives. However, its precision was low, indicating a significant number of false positives. DBSCAN struggled with this dataset, as shown by low precision and recall, suggesting that its density-based clustering was not suitable for the structure of data or the binary nature of the target variable. Hierarchical Clustering underperformed, with low accuracy and a high rate of false positives, indicating difficulty in distinguishing between the classes.
 
--   Each method has its merits, but none offered a robust solution for the given data. K-Means might be preferred for its relative simplicity and better performance in this context. The choice of model depends on the specific requirements and constraints of the task, including the acceptable trade-offs between false positives and negatives and the overall goal of the clustering (e.g., exploratory data analysis, dimensionality reduction, outlier detection).
+-   Each method has its strength and drawbacks, but none offered a robust solution for the given data. K-Means might be preferred for its relative simplicity and better performance in this specific context.
 
--   Future directions could involve more sophisticated techniques such as ensemble methods that combine multiple clustering models to improve overall performance. Moreover, fine-tuning the parameters of each model, exploring feature engineering, or trying alternative clustering approaches like spectral clustering could potentially yield better results. It's also crucial to incorporate domain knowledge, which can guide the choice and tuning of models to align with the underlying data patterns and the goals of the analysis.
+-   Future directions could involve more sophisticated techniques such as ensemble methods that combine multiple clustering models to improve overall performance. 

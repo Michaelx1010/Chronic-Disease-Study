@@ -5,19 +5,25 @@ format:
     code-fold: true
     code-tools: true
 ---
-```{r, message=FALSE, warning=FALSE}
+
+
+## Introduction
+
+The availability and utilization of high-quality data is a crucial part of a successful data science project. For Chronic diseases, which represent a growing public health challenge around the world, require comprehensive and accurate data to faciliate analysis and decison-making. However, real-world healthcare datasets usually come with lots of inconsistency, those including missing values, and errors that can leads to bias and incorrect conclusions. In this section, I am going to perfrom a critical process of data cleaning, where we utilize various techniques and methodologies to solve these issues and transform our dataset into a reliable and ready-for-analysis dataset. By addressing data quality concerns, we have the foundation for reliable epidemiological investigations.
+
+## Data cleaning of the [U.S. Chronic Disease Indicators (CDI)](https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi)
+
+### Load the raw data
+```{r, warning = FALSE}
 library(tidyverse)
-```
-
-### Data cleaning of the [U.S. Chronic Disease Indicators (CDI)](https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi)
-
-```{r}
+library(DT)
 #Load the data
 us_chronic <- read_csv("data/U.S._Chronic_Disease_Indicators__CDI_.csv")
-head(us_chronic)
-glimpse(us_chronic)
+a <- head(us_chronic)
+datatable(a)
 ```
-- Checking for different chronic diseases types
+
+### Checking for different chronic diseases types
 ```{r}
 # Check the categories of different disease incidents
 us_chronic$Topic <- as.factor(us_chronic$Topic)
@@ -25,7 +31,7 @@ category <- levels(us_chronic$Topic)
 category
 ```
 
-- Checking for NA columns
+### Checking for NA columns
 ```{r}
 # Check for NA values in each column
 na_columns <- colSums(is.na(us_chronic))
@@ -33,18 +39,18 @@ na_columns <- colSums(is.na(us_chronic))
 # Display columns with NA values
 print(na_columns)
 ```
-As we can see, variables StratificationCategory2, Stratification2, StratificationCategory3, Stratification3, ResponseID, StratificationCategoryID2, StratificationID2, StratificationCategoryID3, StratificationID3 are completley filled with NA values. We need to drop the columns with completely NA values.
+
+As we can see, variables `StratificationCategory2`, `Stratification2`, `StratificationCategory3`, `Stratification3`, `ResponseID`, `StratificationCategoryID2`, `StratificationID2`, `StratificationCategoryID3`, `StratificationID3` are completley filled with NA values. We need to drop the columns with completely NA values.
 
 ```{r}
 #Drop the columns with completely NA values
 us_chronic <- us_chronic[, colSums(is.na(us_chronic)) != nrow(us_chronic)]
-head(us_chronic)
-glimpse(us_chronic)
+datatable(head(us_chronic))
 ```
 
-- Transforming data to tidy
+### Transforming data to tidy
 
-Let's first look at what is inside StratificationCategory1 and Stratification1.
+- Let's first look at what is inside `StratificationCategory1` and `Stratification1`.
 ```{r}
 #Loop through each unique category
 types_s <- unique(us_chronic$StratificationCategory1)
@@ -58,7 +64,9 @@ for (i in types_s) {
  cat("Types:\n", paste(types, collapse = "\n"), "\n\n")
 }
 ```
-In order to transform data to tidy, I need three column variables specify Race, Gender and Overall.
+
+
+- In order to transform data to tidy, I need three column variables specify `Race`, `Gender` and `Overall`.
 
 ```{r}
 us_chronic_tidy <- us_chronic %>%
@@ -75,10 +83,11 @@ us_chronic_tidy <- us_chronic %>%
   select(-StratificationCategoryID1, -StratificationID1)
 
 # View the resulting tidy dataset
-head(us_chronic_tidy)
-glimpse(us_chronic_tidy)
+datatable(head(us_chronic_tidy))
+
 ```
-- Save the cleaned data
+
+### Save the cleaned data
 
 ```{r}
 write.csv(us_chronic_tidy,file='data/us_chronic.csv', row.names = FALSE) 

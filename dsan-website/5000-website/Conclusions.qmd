@@ -1,1 +1,40 @@
+---
+title: "Conclusions"
+format:
+  html:
+    code-fold: true
+    code-tools: true
+bibliography: references.bib
+---
+![](images/conclusion.jpg)
+
+## Conclusion
+
+- As we warp up our data science project, we have navigated our dataset through comprehensive Exploratory Data Analysis `(EDA)`. Utilizing the essential capabilities of ggplot and Plotly, we drawed histograms and logistic regression plots that visualize relationships within our data, addressing crucial questions about the contributing factors to diabetes and cardiovascular diseases (CVD). Our findings indicate that unhealthy lifestyle choices such as higher BMI, tobacco consumption, high blood pressure, increased glucose levels, and history of stroke all significantly increase the risk of developing diabetes and CVD.
+
+- Moreover, we harness the strength of machine learning models including `Naive Bayes classifier`, which provide us with the capacity to classify data and forecast potential occurrences of diabetes and CVD. Through multiple `clustering` analysis, we tested various techniques to improve our understanding of the data's categorical and numerical implications. Our usage of both `decision tree` models, `classification` and `regression`, has further enabled us to predict CVD incidents and glucose levels with acceptable accuracy.
+
+- This journey of this data science project means a lot to me, the amount of work and brainstorming is astonishing. The insights gleaned from this project not only underscore the importance of healthy living but also open up avenues for personalized patient care. The experience has been profoundly educational, and the knowledge acquired will undoubtedly fuel my future carrer path as data scientist.
+
+
+
+## Methods
+
+### Naive Bayes 
+
+The first model in our analysis is the `Naive Bayes classifier`, which has shown a strong capability for classifying cardiovascular diseases (CVD). It achieved high accuracy in both training and validation sets, with even higher accuracy in validation, indicating good generalization for unseen data. The precision, recall, and F1 scores were all high, showing that the model could effectively balance true positive and negative predictions. The ROC curve analysis, with an AUC of `0.97`, demonstrates the model's excellent ability to distinguish between classes, suggesting its potential as a reliable tool in medical diagnostics.
+
+
+### Clustering
+
+The second part of our analysis involved evaluating three clustering models: `K-Means`, `DBSCAN`, and `Hierarchical Clustering`. K-Means was moderately effective, whereas DBSCAN and Hierarchical Clustering had challenges with precision and accurately distinguishing classes, as indicated by lower performance metrics. Among these, K-Means may be preferred for its simplicity and relative effectiveness.
+
+### Decision tress
+
+Lastly, the Decision Tree model in `classification` and `regression` provided valuable insights into heart disease risks and glucose level predicitions, though its performance varied between the training data and unseen data, suggesting an opportunity for model tuning. The aim is to strike a balance in model complexity to ensure it captures essential patterns without overfitting, thus making reliable predictions for new data.
+
+
+## Insights for future work
+
+Although this data science project is comprehensive, it does have limitations. First, to broaden the scope of the project, I plan to explore not just diabetes and cardiovascular diseases but also other chronic diseases including cancer and Alzheimer's disease. This will offer a more comprehensive view of chronic diseases investogations. Second, to enhance the project's models usages, I plan to integrate additional machine learning models and statistical learning methods, such as linear regression, logistic regression, and deep learning models including RNN, GRU and LSTM. This will not only enrich the analysis but also improve the accuracy and robustness of our predictive modeling. In the future, I plan to keep updating the project regularly with valuable analysis and fresh insight.
 

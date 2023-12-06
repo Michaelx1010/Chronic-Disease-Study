@@ -1,0 +1,187 @@
+---
+title: "Naïve Bayes in R"
+format:
+  html:
+    code-fold: true
+    code-tools: true
+---
+
+### Introduction to Naïve Bayes
+
+1.  Naive Bayes classification, grounded in Bayes' theorem, is a supervised machine learning algorithm designed to categorize items into pre-established labels, it is famous for its proficiency in text-analysis.
+
+2.  The Naive Bayes classification use the Bayes theorem as foundation, the Bayes theorem is given by the conditional probability of some hypothesis given some evidence, the function of the Bayes theorem is given by : $P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}$.
+
+3.  According to the name "Naive Bayes Classier", the object of the supervised machine learning method is having the ability to classify or predict object's label based on the given labels. The algorithm aims to calculate the probability of each class given a set of input features and then assigns the class with the highest probability as the predicted class for the input.
+
+4.  
+
+-   The Gaussian Naive Bayes is used when assume our label/feature data has a normal distribution, it is best suitable for continuous data with a normal distribution.
+
+-   The multinational Naive Bayes is implemented if the data has a discrete variable, it is best suitable for text classification.
+
+-   Bernoulli Naive Bayes is used on binary data, it is best suitable for document classification where it is either present or absence.
+
+
+### Data preparation for Naïve Bayes
+
+1.  Load the cleaned data of the [PimaIndiansDiabetes](https://search.r-project.org/CRAN/refmans/mlbench/html/PimaIndiansDiabetes.html), for this part of analysis, I will be using DIABETES as the target variable.
+
+
+```{r,message=FALSE,warning=FALSE}
+# Load required libraries and implement the cleaned data
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(ggthemes)
+library(DT)
+library(e1071)
+library(caTools)
+library(caret)
+library(mlbench)
+library(cvms)
+
+#us_chronic <- read_csv("data/us_chronic.csv")
+
+data(PimaIndiansDiabetes)
+data <- PimaIndiansDiabetes
+
+```
+
+2.  Split the data into train set, test set and validation set
+
+```{r}
+# Setting the ratio
+fractionTraining   <- 0.60
+fractionValidation <- 0.20
+fractionTest       <- 0.20
+
+# Compute sample sizes.
+sampleSizeTraining   <- floor(fractionTraining   * nrow(data))
+sampleSizeValidation <- floor(fractionValidation * nrow(data))
+sampleSizeTest       <- floor(fractionTest       * nrow(data))
+
+# Create the randomly-sampled indices for the dataframe. Use setdiff() to
+# avoid overlapping subsets of indices.
+indicesTraining    <- sort(sample(seq_len(nrow(data)), size = sampleSizeTraining))
+indicesNotTraining <- setdiff(seq_len(nrow(data)), indicesTraining)
+indicesValidation  <- sort(sample(indicesNotTraining, size = sampleSizeValidation))
+indicesTest        <- setdiff(indicesNotTraining, indicesValidation)
+
+# Finally, output the three dataframes for training, validation, and test.
+data_training   <- data[indicesTraining, ]
+data_validation <- data[indicesValidation, ]
+data_test       <- data[indicesTest, ]
+```
+
+The fundamental objective is to develop a model that exhibits robust performance when presented with novel, unseen data. Through the division of the dataset into distinct sets, this process allows for an evaluation of the model's capability to generalize effectively to real-world data instances that were not part of its training or validation phases.
+
+### Feature selection for record data with repsect to Diabetes
+
+(My data does not contain text data, so only record data wil be modeled)
+
+(The following code was modified from (https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/)), This website gives me a good insight into using R for feature selection.
+
+```{r,warning=FALSE}
+# calculate correlation matrix
+correlationMatrix <- cor(data_training[,1:8])
+# summarize the correlation matrix
+print(correlationMatrix)
+# find attributes that are highly corrected (ideally >0.75)
+highlyCorrelated <- findCorrelation(correlationMatrix, cutoff=0.5)
+# print indexes of highly correlated attributes
+print(highlyCorrelated)
+```
+
+```{r}
+# prepare training scheme
+control <- trainControl(method="repeatedcv", number=10, repeats=3)
+# train the model
+model <- train(diabetes~., data=data_training, method="lvq", preProcess="scale", trControl=control)
+# estimate variable importance
+importance <- varImp(model, scale=FALSE)
+# summarize importance
+print(importance)
+# plot importance
+plot(importance)
+
+```
+
+```{r}
+# define the control using a random forest selection function
+control <- rfeControl(functions=rfFuncs, method="cv", number=10)
+# run the RFE algorithm
+results <- rfe(data_training[,1:8], data_training[,9], sizes=c(1:8), rfeControl=control)
+# summarize the results
+print(results)
+# list the chosen features
+predictors(results)
+# plot the results
+plot(results, type=c("g", "o"))
+```
+
+### Naïve Bayes (NB) with Labeled Record Data
+
+- Model fitting
+
+```{r}
+nb <- data_training %>%
+  select(diabetes, glucose, age, mass, pregnant, insulin, pedigree, triceps, pressure)
+glimpse(nb)
+```
+```{r}
+# Fitting Naive Bayes Model 
+# to training dataset
+set.seed(120)  # Setting Seed
+classifier_cl <- naiveBayes(diabetes ~ ., data = data_training)
+ 
+# Predicting on test data'
+pred <- predict(classifier_cl, newdata = data_test)
+ 
+# Confusion Matrix
+cm <- table(data_test$diabetes, pred)
+ 
+# Model Evaluation
+model <- confusionMatrix(cm)
+model
+
+```
+
+```{r}
+# Calculate F1
+f1_score <- 2 * (0.8901 * 0.7431) / (0.8901 + 0.7431)
+f1_score
+```
+The model achieved 75% accuracy with a p-value of less than 1. The precision in this case is 0.8901, the recall is 0.7431, and the F1 score is 0.81.
+
+- Visualizations
+
+```{r, warning=FALSE}
+# Modified this code with the aid of gpt, it is a great way to visualize accuracies
+# Creating a data frame with actual and predicted values
+result_df <- data.frame(Actual = data_test$diabetes, Predicted = pred)
+
+# Creating a variable to identify correct and incorrect predictions
+result_df$Correct <- ifelse(result_df$Actual == result_df$Predicted, "Correct", "Incorrect")
+
+# Counting occurrences for each combination of actual and predicted values
+counts <- table(result_df$Correct)
+
+# Creating a data frame for plotting
+plot_data <- data.frame(Category = names(counts), Count = as.numeric(counts))
+
+# Plotting
+ggplot(plot_data, aes(x = Category, y = Count, group = 1)) +
+  geom_line(aes(color = Category), size = 1.5) +
+  geom_point(aes(color = Category), size = 3) +
+  labs(title = "Actual vs. Predicted",
+       x = "Category",
+       y = "Count") +
+  scale_color_manual(values = c("Correct" = "green", "Incorrect" = "red")) +
+  theme_minimal()
+```
+
+- Overfitting occurs when a model, trained on a particular set of data, performs poorly on a distinct test set. This issue is marked by a lack of generalization, showcasing low bias and high variance in the model's predictions. With an accuracy hovering around 75%, it suggests a well-balanced performance in capturing patterns without being overly complex or simplistic.
+
+
+

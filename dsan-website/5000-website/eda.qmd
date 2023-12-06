@@ -1,0 +1,552 @@
+---
+title: Data Exploration
+format:
+  html:
+    code-fold: true
+    code-tools: true
+---
+
+
+![](images/eda.jpg)
+
+## Introduction
+
+- EDA(Exploratory Data Analysis) can lead us through investigating our data sources such as the Chronic Disease Indicators (CDI), the Framingham Heart Study, and the Pima Indian Diabetes dataset.
+
+- Our EDA will not only seek to understand the distributions and summaries of crucial variables but also to find out complex structures and relationships within the data. By employing a variety of statistical graphics, plots, and other visualization techniques, we aim to discern patterns, anomalies, relationships, and trends that are often not apparent through raw data. These insights form the foundations of predictive modeling.
+
+-  Each visualization and statistical summary brings us closer to predictive models that can inform healthcare decisions and interventions. Our EDA is the first step in our project to convert data into meaningful insights.
+
+
+::: {.panel-tabset}
+
+# CDI data
+
+## Data understanding
+
+-   Here I'm using the [U.S. Chronic Disease Indicators (CDI)](https://catalog.data.gov/dataset/u-s-chronic-disease-indicators-cdi) data
+
+```{r, message=FALSE, warning=FALSE}
+#Loading required packages
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(ggthemes)
+library(DT)
+library(wesanderson)
+library(ggpubr)
+library(ROCR)
+library(NHANES)
+library(devtools)
+library(data.table)
+library(fpc)
+```
+
+-   Load the cleaned data and check for different variables and data type for each of them
+
+```{r, message=FALSE, warning=FALSE}
+#Load the data
+us_chronic <- read_csv("data/us_chronic.csv")
+datatable(head(us_chronic))
+```
+
+-   Checking for time span of this data set
+
+```{r}
+min(us_chronic$YearStart)
+max(us_chronic$YearEnd)
+```
+
+This data ranges from `2001` to `2021`.
+
+-   Checking for different data types
+
+```{r}
+unique(us_chronic$DataValueType)
+```
+
+-   Checking for location information
+
+```{r}
+loc <- unique(us_chronic$LocationDesc)
+loc
+```
+
+This comprehensive dataset includes all U.S. territories, both within and outside North America.
+
+-   Checking for different categories of Topic and Question of chronic diseases.
+
+```{r}
+types_t <- unique(us_chronic$Topic)
+types_t
+```
+
+There are a total of 17 categories, encompassing Cardiovascular diseases, Cancer, diabetes, and other areas of research inquiry.
+
+```{r}
+# Loop through each unique topic
+for (topic in types_t) {
+  cat("Topic:", topic, "\n")
+  
+# Get unique questions for the current topic
+  questions <- unique(us_chronic$Question[us_chronic$Topic == topic])
+  
+ # Print unique questions
+ cat("Questions:\n", paste(questions, collapse = "\n"), "\n\n")
+}
+```
+
+We obtain a list of questions for each distinct topic, which gives a more comprehensive understanding on how the data is structured around types of topics and types of questions.
+
+```{r}
+unique(us_chronic$Stratification1)
+```
+
+### Descriptive statistics and Data Visualization
+
+-   Years Summary
+
+```{r}
+#Year summary
+datatable(summary(us_chronic[, c("YearStart", "YearEnd")]))
+```
+
+-   Data value summary for each distinct data types
+
+```{r, warning=FALSE}
+#Data value summary
+us_chronic %>%
+  group_by(DataValueType) %>%
+  summarize(
+    Mean = mean(DataValueAlt, na.rm = TRUE),
+    Median = median(DataValueAlt, na.rm = TRUE),
+    SD = sd(DataValueAlt, na.rm = TRUE),
+    Min = min(DataValueAlt, na.rm = TRUE),
+    Max = max(DataValueAlt, na.rm = TRUE)
+  )
+```
+
+-   visualizing distribution of categorical variables
+
+Chronic diseases type
+
+```{r}
+p1 <- ggplot(us_chronic, aes(x = Topic, fill = Topic)) +
+  geom_bar() +
+  labs(title = "Frequency Distribution of Chronic diseases types",
+       x = "Chronic diseases",
+       y = "Frequency")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_fill_hue()
+ggplotly(p1)
+```
+
+There are lots of data on `Cancer`, `Diabetes`, and `Cardiovascular diseases`.
+
+- Locations
+
+```{r}
+p2 <- ggplot(us_chronic, aes(x = LocationDesc, fill = LocationDesc)) +
+  geom_bar() +
+  labs(title = "Frequency Distribution of Locations",
+       x = "Locations",
+       y = "Frequency")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_fill_hue()
+ggplotly(p2)
+```
+
+We can see that the data of each state are approximately uniformly distrbuted.
+
+
+-   Visualizing correlations and data grouping
+
+1.  Prevalence of diagnosed diabetes among adults aged \>= 18 years and Obesity among adults aged \>= 18 years
+
+```{r}
+#e1 <- us_chronic %>%
+#  filter(Question == "Prevalence of diagnosed diabetes among adults aged >= 18 years" |
+#         Question == "Obesity among adults aged >= 18 years")
+#e1 <- e1 %>%
+#  filter(DataValueType == "Crude Prevalence")
+#e1 <- e1 %>%
+#  filter(!is.na(Overall))
+#glimpse(e1)
+#e1 <- e1 %>%
+#  pivot_wider(names_from = c(Topic), values_from = DataValueAlt)
+#colnames(e1)[ncol(e1) - 1] <- "Obesity"
+#e1 <- e1 %>%
+#  select(YearStart, LocationAbbr, Diabetes, Obesity)
+#e1 <- e1 %>%
+#  pivot_wider(names_from = c(YearStart, LocationAbbr, values_from = c(Diabetes, Obesity)))
+#e1 <- e1 %>% arrange(YearStart, LocationAbbr)
+#e1_filled <- e1 %>%
+#  group_by(YearStart, LocationAbbr) %>%
+#  mutate(Diabetes = ifelse(is.na(Diabetes), mean(Diabetes, na.rm = TRUE), Diabetes)) %>%
+#  ungroup()
+#e1_filled <- na.omit(e1_filled)
+```
+
+```{r}
+# Filter the data
+e1 <- us_chronic %>%
+  filter(
+    Question %in% c("Prevalence of diagnosed diabetes among adults aged >= 18 years", "Obesity among adults aged >= 18 years"),
+    DataValueType == "Crude Prevalence",
+    !is.na(Overall)
+  )
+
+# Pivot the data
+e1 <- e1 %>%
+  pivot_wider(names_from = Topic, values_from = DataValueAlt)
+
+# Rename the Obesity column
+colnames(e1)[ncol(e1) - 1] <- "Obesity"
+
+# Select relevant columns
+e1 <- e1 %>%
+  select(YearStart, LocationAbbr, Diabetes, Obesity)
+
+# Group, fill NAs, and arrange the data
+e1_filled <- e1 %>%
+  group_by(YearStart, LocationAbbr) %>%
+  mutate(Diabetes = ifelse(is.na(Diabetes), mean(Diabetes, na.rm = TRUE), Diabetes)) %>%
+  ungroup() %>%
+  arrange(YearStart, LocationAbbr)
+
+# Remove rows with NA values
+e1_filled <- na.omit(e1_filled)
+
+# View the result
+glimpse(e1_filled)
+```
+
+```{r}
+ep1 <- ggplot(e1_filled, aes(x = Obesity, y = Diabetes, color = LocationAbbr)) +
+  geom_point() +
+  labs(title = "Correlation between Diabetes and Obesity",
+       x = "Obesity Prevalence (%) per state",
+       y = "Diabetes Prevalence (%) per state") +
+  theme_minimal()
+
+ggplotly(ep1)
+```
+
+We observe a positive correlation between the prevalence of diabetes and obesity within a specific state across multiple years.
+
+2.  High cholesterol prevalence among adults aged \>= 18 years and Current smoking among adults aged \>= 18 years
+
+```{r}
+# Filter the data
+e2 <- us_chronic %>%
+  filter(
+    Question %in% c("High cholesterol prevalence among adults aged >= 18 years", "Current smoking among adults aged >= 18 years"),
+    DataValueType == "Crude Prevalence",
+    !is.na(Overall)
+  )
+
+# Pivot the data
+e2 <- e2 %>%
+  pivot_wider(names_from = Topic, values_from = DataValueAlt)
+
+# Rename the High cholestero
+colnames(e2)[ncol(e2) - 1] <- "Hc"
+
+# Select relevant columns
+e2 <- e2 %>%
+  select(YearStart, LocationAbbr, Hc, Tobacco)
+
+# Group, fill NAs, and arrange the data
+e2_filled <- e2 %>%
+  group_by(YearStart, LocationAbbr) %>%
+  mutate(Hc = ifelse(is.na(Hc), mean(Hc, na.rm = TRUE), Hc)) %>%
+  ungroup() %>%
+  arrange(YearStart, LocationAbbr)
+
+# Remove rows with NA values
+e2_filled <- na.omit(e2_filled)
+
+# View the result
+glimpse(e2_filled)
+```
+
+```{r}
+ep2 <- ggplot(e2_filled, aes(x = Tobacco, y = Hc, color = LocationAbbr)) +
+  geom_point() +
+  labs(title = "Correlation between High cholesterol prevalence and Tobacco use",
+       x = "Tobacco use (%) per state",
+       y = "High cholesterol prevalence (%) per state") +
+  theme_minimal()
+
+ggplotly(ep2)
+```
+
+We observe a positive correlation between the prevalence of High cholesterol prevalence and Tobacco within a specific state across multiple years.
+
+3.  Cancer of the prostate, mortality and Binge drinking frequency among adults aged \>= 18 years who binge drink
+
+```{r}
+# Filter the data
+e3 <- us_chronic %>%
+  filter(
+    Question %in% c("Cancer of the prostate, mortality", "Binge drinking frequency among adults aged >= 18 years who binge drink"))
+
+
+e3 <- us_chronic %>%
+  filter(
+    Question %in% c("Cancer of the prostate, mortality", "Binge drinking frequency among adults aged >= 18 years who binge drink"),
+    DataValueType %in% c( "Average Annual Crude Rate","Mean"),
+    !is.na(Overall)
+  )
+
+# Pivot the data
+e3 <- e3 %>%
+  pivot_wider(names_from = Topic, values_from = DataValueAlt)
+
+# Rename the Prostate Cancer column
+colnames(e3)[ncol(e3) - 1] <- "ProstateCancer"
+
+# Select relevant columns
+e3 <- e3 %>%
+  select(YearStart, LocationAbbr, ProstateCancer, Alcohol)
+
+# Group, fill NAs, and arrange the data
+e3_filled <- e3 %>%
+  group_by(YearStart, LocationAbbr) %>%
+  mutate(ProstateCancer = ifelse(is.na(ProstateCancer), mean(ProstateCancer, na.rm = TRUE), ProstateCancer)) %>%
+  ungroup() %>%
+  arrange(YearStart, LocationAbbr)
+
+# Remove rows with NA values
+e3_filled <- na.omit(e3_filled)
+
+# View the result
+glimpse(e3_filled)
+```
+
+```{r}
+ep3 <- ggplot(e3_filled, aes(x = Alcohol, y = ProstateCancer, color = LocationAbbr)) +
+  geom_point() +
+  labs(title = "Correlation between Binge Drinking and Prostate Cacner mortality",
+       x = "Means of binge drinking per state",
+       y = "Prostate Cancer mortality (%) per state") +
+  theme_minimal()
+
+ggplotly(ep3)
+```
+
+The absence of a discernible correlation suggests that the mortality rate of prostate cancer is likely influenced by factors other than binge drinking. Other significant variables may play a crucial role in determining prostate cancer mortality rates.
+
+### Hypothesis Generation
+
+Based on the previous data cleaning, data wrangling, and data EDA, I formulated the following hypothesis to add onto my research question:
+
+1.  There exists a correlation between obesity and diabetes, suggesting a potential interconnections between these two health indicators.
+
+2.  Smoking exhibits a correlation with high cholesterol levels and other cardiovascular diseases, implying a potential association between smoking habits and cardiovascular health conditions.
+
+The forthcoming data analysis will delve into a thorough examination of the initial research question.
+
+### Outliers detection
+
+In this section, I will utilize the previously examined data on obesity and diabetes as an illustrative example. Subsequently, I will recycle the established code for use in other investigative analyses.
+
+```{r, warning=FALSE, message=FALSE}
+# Histogram
+ggplot(e1_filled, aes(x = Diabetes)) +
+  geom_histogram() +
+  labs(title = "Histogram of Diabetes data", x = "Diabetes") +
+  theme_minimal()
+
+# Boxplot
+ggplot(e1_filled, aes(y = Diabetes)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Data", y = "Diabetes") +
+  theme_minimal()
+
+# Q-Q plot
+qqnorm(e1_filled$Diabetes)
+qqline(e1_filled$Diabetes, col = "red")
+
+```
+
+The visualizations reveal that the distribution of our data closely approximates a normal distribution. The histogram highlights a concentration of values around the mean, with a noticeable tail extending beyond a value of 15. Additionally, the boxplot illustrates the majority of the data clustering within the interquartile range, while a few outliers are observed towards the upper end of the distribution. These findings suggest a generally normal distribution with a presence of notable outliers at higher values.
+
+### EDA Reports
+
+(All the tabular reports could be accessed through Data Understanding and Descriptive Statistics.)
+
+The dataset under examination is a comprehensive repository encompassing chronic disease data across U.S. territories from 2001 to 2021. Comprising 1,185,676 observations and 26 variables, each entry corresponds to a specific U.S. state in a given year. The dataset encompasses 17 major categories, spanning cardiovascular diseases, diabetes, cancer, nutritional information, kidney disease, mental health, and more. Further granularity is provided by 19 distinct data types, including crude rates, age-adjusted crude rates, means, and various other metrics.
+
+This expansive dataset poses a significant challenge due to its scale and complexity. Through exploratory data analysis (EDA), the intricacies of these diverse categories and subcategories have been elucidated. EDA has been instrumental in unraveling the nuances of prevalence rates, mortality figures, and population statistics for tobacco users, among others. The EDA process involved thorough examination of data distributions and utilization of ggplot for in-depth visualizations, facilitating a comprehensive understanding of underlying correlations.
+
+Armed with these insights, the groundwork has been laid for a more detailed and nuanced data analysis. The multifaceted nature of the dataset, coupled with the systematic approach taken thus far, positions the research to delve into intricate patterns and relationships, paving the way for a robust and comprehensive machine learning modeling.
+
+### Tools and softwares
+
+For the core of this project, I will leverage R and the powerful tools provided by the tidyverse, specifically utilizing ggplot2 for creating insightful visualizations. Additionally, to enhance the depth and breadth of the project, I plan to incorporate Python into the analysis. Python libraries such as Seaborn,Plotly and Scikit-learn will be employed to further enrich the project's dimensions and offer diverse perspectives through their advanced plotting capabilities and machine learning model constructing. This multi-language approach aims to harness the strengths of both R and Python, ensuring a comprehensive and robust analysis.
+
+
+
+# Framingham Heart Study data set
+
+## Data understanding
+
+-   Here I'm using [Framingham Heart Study Longitudinal Data](https://www.framinghamheartstudy.org/fhs-for-researchers/data-available-overview/)
+
+- Load the data
+```{r}
+data <- read_csv("data/frmgham2.csv")
+datatable(head(data))
+```
+
+## Summary statistics
+
+```{r}
+datatable(summary(data))
+```
+
+This data set contains all numerical data, including both continuous variables, factor variables and binary variables.
+
+## Trasnform BMI groups into factors
+```{r}
+setDT(data)
+data[,BMIgroup:= cut(BMI,c(0,18,25,30,100),labels=c("underweight","normal","overweight","obese"))]
+data[,table(BMIgroup)]
+```
+
+
+## Visualization
+
+### Overall distribution histograms for continuous variables
+
+```{r, warning = FALSE, message = FALSE}
+a1<-ggplot(data, aes(x=AGE,fill=BMIgroup)) + geom_histogram()+theme_gdocs()+
+labs( x = "Age", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="Zissou1"))
+
+a2<-ggplot(data, aes(x=AGE,fill=PREVHYP)) + geom_histogram()+theme_gdocs()+
+labs(x = "Age", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="Zissou1"))
+
+b1<-ggplot(data, aes(x=BMI,fill=BMIgroup)) + geom_histogram()+theme_gdocs()+
+labs( x = "BMI Index", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+b2<-ggplot(data, aes(x=BMI,fill=PREVHYP)) + geom_histogram()+theme_gdocs()+
+labs( x = "BMI Index", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+g1<-ggplot(data, aes(x=GLUCOSE,fill=BMIgroup)) + geom_histogram()+theme_gdocs()+
+labs( x = "Glucose level", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="Zissou1"))
+
+g2<-ggplot(data, aes(x=GLUCOSE,fill=PREVHYP)) + geom_histogram()+theme_gdocs()+
+labs( x = "Glucose level", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="Zissou1"))
+
+t1<-ggplot(data, aes(x=TOTCHOL,fill=BMIgroup)) + geom_histogram()+theme_gdocs()+
+labs( x = "Serum Total Cholesterol", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+t2<-ggplot(data, aes(x=TOTCHOL,fill=PREVHYP)) + geom_histogram()+theme_gdocs()+
+labs( x = "Serum Total Cholesterol", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+s1<-ggplot(data, aes(x=SYSBP,fill=BMIgroup)) + geom_histogram()+theme_gdocs()+
+labs(x = "Systolic Blood Pressure", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+s2<-ggplot(data, aes(x=SYSBP,fill=PREVHYP)) + geom_histogram()+theme_gdocs()+
+labs( x = "Systolic Blood Pressure", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+d1<-ggplot(data, aes(x=DIABP,fill=BMIgroup)) + geom_histogram()+theme_gdocs()+
+labs( x = "Diastolic Blood Pressure", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+d2<-ggplot(data, aes(x=DIABP,fill=PREVHYP)) + geom_histogram()+theme_gdocs()+
+labs( x = "Diastolic Blood Pressure", y = "Count")+scale_fill_manual(values=wes_palette(n=5, name="IsleofDogs1"))
+
+figure1 <- ggarrange(a1,a2,b1,b2,g1,g2,t1,t2,s1,s2,d1,d2,
+                    ncol =3, nrow = 4)
+figure1
+```
+
+The histograms indicate that the continuous variables, such as `age`, `BMI`, `glucose levels`, `serum total cholesterol`, and `blood pressure`, have approximate normal distributions. These visualizations aid in comprehending the data's spread across different health-related categories, such as `BMI` groups and `pre-hypertension` status. Furthermore, the distributions suggest potential correlations between these health metrics and risk categories, which could be crucial for risk stratification and targeted interventions in public health.
+
+
+### Relation plots for DIABETES
+```{r, warning = FALSE, message = FALSE}
+q1<-ggplot(data, aes(BMI,DIABETES))+
+stat_smooth(method='glm', method.args=list(family='binomial'))+theme_gdocs()+
+labs(title ="DIABETES versus BMI", x = "BMI", y = "DIABETES index")+
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q2<-ggplot(data, aes(GLUCOSE,DIABETES))+
+stat_smooth(method='glm', method.args=list(family='binomial'))+theme_gdocs()+
+labs(title ="versus GLUCOSE", x = "GLUCOSE", y = "DIABETES index")+
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q3<-ggplot(data, aes(SYSBP,DIABETES))+
+stat_smooth(method='glm', method.args=list(family='binomial'))+theme_gdocs()+
+labs(title ="versus Systolic Blood Pressure", x = "Systolic Blood Pressure", y = "DIABETES index")+
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q4<-ggplot(data, aes(DIABP,DIABETES))+
+stat_smooth(method='glm', method.args=list(family='binomial'))+theme_gdocs()+
+labs(title ="versus Dastolic Blood Pressure", x = "Dastolic Blood Pressure", y = "DIABETES index")+
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q5<-ggplot(data, aes(PREVSTRK,DIABETES))+
+stat_smooth(method='glm', method.args=list(family='binomial'))+theme_gdocs()+
+labs(title ="versus Prevalent Stroke", x = "Prevalent Stroke", y = "DIABETES index")+
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+figure9 <- ggarrange(q1,q2,q3,q4,q5,
+                    ncol =3, nrow = 2)
+figure9
+```
+
+the visualizations illustrate the statistical relationships between various data variables and the Diabetes, a binary measure indicating the likelihood of diabetes. There is a clear logistic association between the Diabetes and `Body Mass Index (BMI)`, with higher `BMI` values corresponding to increased diabetes likelihoods, reinforcing the established link between obesity and Type 2 Diabetes. A starkly steep correlation is observed with `glucose` levels; as `glucose` increases, the Diabetes Index surges sharply, making `glucose` level as a critical indicator of diabetes. Both `systolic` and `diastolic` blood pressures show a more gradual but consistent increase in the Diabetes Index, suggesting that higher blood pressure is a contributing risk factor for diabetes. Additionally, the presence of a prevalent `stroke` seems to correlate with a higher Diabetes Index, indicating a history of `stroke` may be associated with increased diabetes risk. 
+
+### Relation plots for cardiovascular diseaes
+
+```{r ,warning = FALSE}
+q1<-ggplot(data, aes(BMI,CVD)) +
+stat_smooth(method='glm', method.args=list(family='binomial')) + theme_gdocs() +
+labs(title ="CVD versus BMI", x = "BMI", y = "CVD index") +
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q2<-ggplot(data, aes(GLUCOSE,CVD)) +
+stat_smooth(method='glm', method.args=list(family='binomial')) + theme_gdocs() +
+labs(title ="CVD versus GLUCOSE", x = "GLUCOSE", y = "CVD index") +
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q3<-ggplot(data, aes(SYSBP,CVD)) +
+stat_smooth(method='glm', method.args=list(family='binomial')) + theme_gdocs() +
+labs(title ="CVD versus Systolic Blood Pressure", x = "Systolic Blood Pressure", y = "CVD index") +
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q4<-ggplot(data, aes(DIABP,CVD)) +
+stat_smooth(method='glm', method.args=list(family='binomial')) + theme_gdocs() +
+labs(title ="CVD versus Diastolic Blood Pressure", x = "Diastolic Blood Pressure", y = "CVD index") +
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+q5<-ggplot(data, aes(PREVSTRK,CVD)) +
+stat_smooth(method='glm', method.args=list(family='binomial')) + theme_gdocs() +
+labs(title ="CVD versus Prevalent Stroke", x = "Prevalent Stroke", y = "CVD index") +
+scale_color_manual(values=wes_palette(n=5, name="Zissou1"))
+
+figure9 <- ggarrange(q1, q2, q3, q4, q5,
+                     ncol = 3, nrow = 2)
+figure9
+
+```
+
+
+
+The visualizations depict the statistical associations between various health data variables and the Cardiovascular Disease `(CVD)` Index, which reflects the likelihood of cardiovascular conditions. There is a distinct logistic relationship between CVD and Body Mass Index `(BMI)`, with higher `BMI` values showing an elevated likelihoods of `CVD`, highlighting the recognized connection between obesity and cardiovascular health. A markedly pronounced correlation is evident with `glucose` levels; as `glucose` rises, the `CVD` Index increases sharply, marking `glucose` level as a crucial indicator of cardiovascular health risks. Both `systolic` and `diastolic` blood pressures exhibit a more incremental yet steady ascent in the `CVD` Index, indicating that elevated blood pressure is a significant risk factor for cardiovascular diseases. Furthermore, the occurrence of a previous stroke is linked with a higher `CVD` Index, suggesting that a history of stroke may be linked with an increased risk of cardiovascular diseases.
+
+
+
+## EDA reports
+
+In conclusion, the exploratory data analysis highlights significant statistical correlations between key health metrics—such as elevated `BMI`, `glucose` levels, and blood pressure—and the heightened risk of both cardiovascular diseases and diabetes. The particularly pronounced impact of `glucose` levels on the risk profile accentuates the importance of metabolic health in the prevention of these chronic conditions. The data also indicates that a history of `stroke` or existing diabetes contributes to an increased cardiovascular risk, suggesting that individuals with such backgrounds require rigorous monitoring and management. These insights advocate for comprehensive health strategies that address weight control, glycemic regulation, and hypertension management to effectively mitigate the risks of cardiovascular diseases and diabetes.
+
+## Tools and softwares
+
+For the core of this project, I will leverage R and the powerful tools provided by the tidyverse, specifically utilizing ggplot2 for creating insightful visualizations. Additionally, to enhance the depth and breadth of the project, I plan to incorporate Python into the analysis. Python libraries such as Seaborn,Plotly and Scikit-learn will be employed to further enrich the project's dimensions and offer diverse perspectives through their advanced plotting capabilities and machine learning model constructing. This multi-language approach aims to harness the strengths of both R and Python, ensuring a comprehensive and robust analysis.
+
+:::
+
+
